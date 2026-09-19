@@ -3,8 +3,8 @@ import { experimental_evaluate as evaluate } from "ai";
 import { createGateway } from "@ai-sdk/gateway";
 import { AppError } from "./access";
 import { config } from "./config";
-import { guessQuestions, gradeGuess, GUESS_PROMPT_VERSION } from "./guess";
-import { hostQuestions, hostState, HOST_PROMPT_VERSION } from "./host";
+import { guessQuestions, gradeGuess } from "./guess";
+import { hostQuestions, hostState } from "./host";
 import { CONFIDENCE_THRESHOLD } from "@/shared/confidence";
 import { decisions, type Decision, type PuzzleInput } from "@/shared/puzzle";
 export function selectKey(source: string, byok: string | null) {
@@ -128,8 +128,6 @@ export async function judge(
           },
         },
         model: config().model,
-        promptVersion:
-          kind === "guess" ? GUESS_PROMPT_VERSION : HOST_PROMPT_VERSION,
         confidence: confidence || null,
         confidenceThreshold: kind === "guess" ? CONFIDENCE_THRESHOLD : null,
         inputTokens: r.usage.inputTokens,

@@ -215,7 +215,7 @@ export async function handle(req: NextRequest, paths: string[]) {
       if (action === "trace" && method === "GET") {
         if (s.status === "active") throw new AppError("game_active", 409);
         const turns = await query(
-          sql`SELECT id,kind,input,status,decision,metadata->'model' AS model,metadata->'promptVersion' AS prompt_version,metadata->'trace' AS trace FROM turns WHERE session_id=${id} ORDER BY created_at,id`,
+          sql`SELECT id,kind,input,status,decision,metadata->'model' AS model,metadata->'trace' AS trace FROM turns WHERE session_id=${id} ORDER BY created_at,id`,
         );
         return reply({ turns });
       }

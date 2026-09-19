@@ -1,8 +1,6 @@
 import "server-only";
 import { normalizeHostDecision, type PuzzleInput } from "@/shared/puzzle";
 
-export const HOST_PROMPT_VERSION = "host-v1.5";
-
 // Keep the production contract aligned with tests/fixtures/host-prompt.json.
 export function hostQuestions() {
   return {

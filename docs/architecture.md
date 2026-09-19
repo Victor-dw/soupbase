@@ -8,7 +8,7 @@
 
 ## 主持人
 
-`src/server/host.ts` 定义 `host-v1.5`，使用 Choice：yes / no / irrelevant / uncertain。
+`src/server/host.ts` 定义提问提示词，使用 Choice：yes / no / irrelevant / uncertain。
 
 - 已知或可可靠推导的事实先回答是/不是，包括无关细节。
 - 未知、无关细节回答不重要；未知但关系到核心解释的信息回答暂时无法判断。
@@ -17,7 +17,7 @@
 
 ## 还原判断
 
-`src/server/guess.ts` 定义 `guess-v1.2`。每个必需关键点使用 Choice 判断成立/缺失/矛盾，另检查整体解释。结合公开汤面理解简短还原，不要求重复已知事实，也不从汤底替玩家补上缺失的核心机制。
+`src/server/guess.ts` 定义还原提示词。每个必需关键点使用 Choice 判断成立/缺失/矛盾，另检查整体解释。结合公开汤面理解简短还原，不要求重复已知事实，也不从汤底替玩家补上缺失的核心机制。
 
 全部关键点 supported、整体 coherent，且每项原生 confidence ≥ 0.70 才通关。缺失、非法或低置信度结果不会解锁答案。旧记录保留当时门槛；缺少门槛的旧还原记录回退到历史值 0.90。
 
