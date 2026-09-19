@@ -47,10 +47,11 @@ export async function judge(
     string,
     { type: "choice"; instructions: string; criteria: Record<string, string> }
   > = kind === "guess" ? guessQuestions(p) : hostQuestions();
+  const state = hostState(p, input, kind === "guess" ? [] : history);
   try {
     const r = await evaluate({
       model: gateway.evaluationModel(config().model),
-      state: hostState(p, input, kind === "guess" ? [] : history),
+      state,
       questions,
       maxRetries: 0,
       abortSignal: AbortSignal.timeout(20000),
@@ -71,6 +72,61 @@ export async function judge(
             )
           : hostDecision(answers?.answer),
       metadata: {
+        trace: {
+          request: {
+            model: config().model,
+            state,
+            questions,
+            maxRetries: 0,
+            timeoutMs: 20000,
+          },
+          // Explicit allowlist: never persist transport headers or provider error bodies.
+          response: {
+            answers: Object.fromEntries(
+              Object.entries(questions).map(([id, q]) => {
+                const answer = answers?.[id];
+                return [
+                  id,
+                  {
+                    choice:
+                      answer && Object.hasOwn(q.criteria, answer.choice)
+                        ? answer.choice
+                        : null,
+                    probabilities: Object.fromEntries(
+                      Object.keys(q.criteria).flatMap((choice) => {
+                        const value = answer?.probabilities?.[choice];
+                        return typeof value === "number" &&
+                          Number.isFinite(value) &&
+                          value >= 0 &&
+                          value <= 1
+                          ? [[choice, value]]
+                          : [];
+                      }),
+                    ),
+                  },
+                ];
+              }),
+            ),
+            confidence: Object.fromEntries(
+              Object.keys(questions).map((id) => {
+                const value = confidence?.[id];
+                return [
+                  id,
+                  typeof value === "number" &&
+                  Number.isFinite(value) &&
+                  value >= 0 &&
+                  value <= 1
+                    ? value
+                    : null,
+                ];
+              }),
+            ),
+            usage: {
+              inputTokens: r.usage.inputTokens,
+              outputTokens: r.usage.outputTokens,
+            },
+          },
+        },
         model: config().model,
         promptVersion:
           kind === "guess" ? GUESS_PROMPT_VERSION : HOST_PROMPT_VERSION,

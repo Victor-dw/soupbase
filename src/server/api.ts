@@ -212,6 +212,13 @@ export async function handle(req: NextRequest, paths: string[]) {
       if (!id) throw new AppError("not_found", 404);
       const s = await session(id, v.id);
       if (!action && method === "GET") return reply(await game(id, v.id));
+      if (action === "trace" && method === "GET") {
+        if (s.status === "active") throw new AppError("game_active", 409);
+        const turns = await query(
+          sql`SELECT id,kind,input,status,decision,metadata->'model' AS model,metadata->'promptVersion' AS prompt_version,metadata->'trace' AS trace FROM turns WHERE session_id=${id} ORDER BY created_at,id`,
+        );
+        return reply({ turns });
+      }
       if (action === "reveal" && method === "POST") {
         await query(
           sql`UPDATE sessions SET status=CASE WHEN status='solved' THEN 'solved' ELSE 'revealed' END,pending_id=NULL,lease_until=NULL,updated_at=now() WHERE id=${id}`,

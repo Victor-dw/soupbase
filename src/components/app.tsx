@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import type { Game, PublicPuzzle, PuzzleInput } from "@/shared/puzzle";
 import { Confidence } from "./confidence";
+import { ModelTrace } from "./model-trace";
 type Config = {
   mode: string;
   model: string;
@@ -90,6 +91,7 @@ const errors: Record<string, [string, string]> = {
 export default function App({ locale }: { locale: "zh" | "en" }) {
   const en = locale === "en",
     t = (zh: string, eng: string) => (en ? eng : zh);
+  const [showResponse, setShowResponse] = useState(false);
   const [creating, setCreating] = useState(false);
   const [view, setView] = useState<View>("play"),
     [cfg, setCfg] = useState<Config>(),
@@ -479,7 +481,7 @@ export default function App({ locale }: { locale: "zh" | "en" }) {
           {!standalone && (
             <aside>
               <div className="section-heading">
-                {t("精选题目", "PUZZLES")}{" "}
+                {t("示例题目", "EXAMPLE PUZZLES")}{" "}
                 <span>
                   {String(
                     puzzles.filter((p) => p.language === locale).length,
@@ -596,6 +598,7 @@ export default function App({ locale }: { locale: "zh" | "en" }) {
                           </a>
                         )}
                       </div>
+                      <ModelTrace key={game.id} sessionId={game.id} en={en} />
                     </section>
                   ) : null}
                   <details
@@ -667,6 +670,25 @@ export default function App({ locale }: { locale: "zh" | "en" }) {
                             </span>
                             {turn.status === "complete" && turn.confidence && (
                               <Confidence value={turn.confidence} en={en} />
+                            )}
+                            {showResponse && turn.status === "complete" && (
+                              <details className="model-trace">
+                                <summary>
+                                  {t("模型 Response", "Model response")}
+                                </summary>
+                                {turn.response ? (
+                                  <pre>
+                                    {JSON.stringify(turn.response, null, 2)}
+                                  </pre>
+                                ) : (
+                                  <p className="muted small">
+                                    {t(
+                                      "这条历史记录未保存 Response。",
+                                      "No response was recorded for this older turn.",
+                                    )}
+                                  </p>
+                                )}
+                              </details>
                             )}
                           </div>
                         </div>
@@ -943,6 +965,22 @@ export default function App({ locale }: { locale: "zh" | "en" }) {
               <div className="eyebrow">PREFERENCES</div>
               <h1>{t("设置", "Settings")}</h1>
               <section>
+                <label className="choice-row">
+                  <input
+                    type="checkbox"
+                    checked={showResponse}
+                    onChange={(e) => setShowResponse(e.target.checked)}
+                  />
+                  {t("显示模型 Response", "Show model response")}
+                </label>
+                <p className="muted small">
+                  {t(
+                    "在每条回答下查看选项、概率和置信度。本局结束后可查看完整 Request / Response。",
+                    "Inspect choices, probabilities and confidence under each answer. Request / response records become available when the game ends.",
+                  )}
+                </p>
+              </section>
+              <section>
                 <h2>{t("由谁提供模型调用", "Model access")}</h2>
                 <div className="choice-row">
                   {cfg?.mode !== "byok_only" && (
@@ -1156,7 +1194,7 @@ export default function App({ locale }: { locale: "zh" | "en" }) {
                             {p.visibility === "private"
                               ? t("私有", "Private")
                               : p.visibility === "curated"
-                                ? t("精选", "Curated")
+                                ? t("示例", "Example")
                                 : t("链接分享", "Unlisted")}
                           </span>
                         </div>

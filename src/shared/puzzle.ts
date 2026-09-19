@@ -127,6 +127,7 @@ export type Game = {
     decision: string;
     status: string;
     confidence: TurnConfidence | null;
+    response?: unknown;
   }[];
   solution?: string;
 };

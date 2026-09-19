@@ -1109,3 +1109,25 @@ summary {
 .game-scroll > .solution {
   margin-top: 16px;
 }
+
+.model-trace {
+  margin-top: 16px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.model-trace summary {
+  cursor: pointer;
+  font-size: 13px;
+  padding: 8px 0;
+}
+.model-trace pre {
+  max-height: 320px;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+  line-height: 1.65;
+  padding: 12px;
+  border: 1px solid currentColor;
+  border-radius: 6px;
+}

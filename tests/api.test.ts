@@ -203,6 +203,16 @@ describe("resource access and gameplay", () => {
       checks: [{ kind: "answer", score: 0.99 }],
     });
     expect(r.data.turns[0]).not.toHaveProperty("metadata");
+    expect(r.data.turns[0].response.answers.answer.choice).toBe("yes");
+    expect(r.data.turns[0].response.confidence.answer).toBe(0.99);
+    expect(JSON.stringify(r.data)).not.toContain(examples[0].solution);
+    expect(JSON.stringify(r.data)).not.toContain('"request":');
+    expect((await player.request(`sessions/${sessionId}/trace`)).status).toBe(
+      409,
+    );
+    expect((await stranger.request(`sessions/${sessionId}/trace`)).status).toBe(
+      404,
+    );
     expect(mocked.keys.at(-1)).toBe(key);
     const count = mocked.keys.length;
     await player.request(`sessions/${sessionId}/questions`, "POST", body, key);
@@ -278,6 +288,26 @@ describe("resource access and gameplay", () => {
     ).toBe(200);
     const r = await player.request(`sessions/${sessionId}/reveal`, "POST", {});
     expect(r.data.solution).toBe(examples[0].solution);
+    const trace = await player.request(`sessions/${sessionId}/trace`);
+    expect(trace.status).toBe(200);
+    expect(trace.data.turns[0].trace.request.state.reference.solution).toBe(
+      examples[0].solution,
+    );
+    expect(trace.data.turns[0].trace.request.state.player_input).toBe(
+      "他看到了灯吗？",
+    );
+    expect(trace.data.turns[0].trace.request.questions.answer.type).toBe(
+      "choice",
+    );
+    expect(trace.data.turns[0].trace.response.answers.answer.choice).toBe(
+      "yes",
+    );
+    expect(JSON.stringify(trace.data)).not.toContain(
+      "canary-secret-alpha-never-persist",
+    );
+    expect((await stranger.request(`sessions/${sessionId}/trace`)).status).toBe(
+      404,
+    );
     expect(
       (
         await player.request(
@@ -550,6 +580,12 @@ describe("explanation submission", () => {
     expect(r.data.solution).toBe(examples[0].solution);
     const restored = await client.request(`sessions/${id}`);
     expect(restored.data.status).toBe("solved");
+    const trace = await client.request(`sessions/${id}/trace`);
+    expect(trace.status).toBe(200);
+    expect(trace.data.turns.at(-1).trace.request.state.history).toEqual([]);
+    expect(
+      trace.data.turns.at(-1).trace.response.answers.coherence.choice,
+    ).toBe("coherent");
     expect(restored.data.turns.at(-1).confidence.threshold).toBe(0.7);
     const count = mocked.keys.length;
     expect((await guess(client, id)).status).toBe(409);
