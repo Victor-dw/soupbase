@@ -9,7 +9,7 @@
 1. 点击 README 的部署按钮。部署流程会引导连接 Neon 集成、创建数据库，并自动注入 `DATABASE_URL`。选择套餐时确认其费用。
 2. 选择唯一的功能设置 `AI_ACCESS_MODE`：`byok_only`、`site_only` 或 `both`。
 3. 站点 Key + BYOK 按钮默认 `both`，要求你填自己的 `AI_GATEWAY_API_KEY`；仅 BYOK 按钮默认 `byok_only`，无需站点 Key。
-4. Vercel 使用 Node 24 和仓库中的 `vercel.json`。构建成功后自动建表、初始化示例、同步 Git 题库。
+4. Vercel 使用 Node 24 和仓库中的 `vercel.json`。构建成功后自动建表、同步 Git 题库。
 5. 域名取当前请求 origin，生产修改请求必须同源；无需额外的域名环境变量。自定义域名在 Vercel Domains 中管理。
 
 Neon 集成产品描述采用[官方 Vercel/Neon 模板](https://github.com/neondatabase-labs/vercel-marketplace-neon)的 Deploy Button 配置。集成的创建、计费和授权由 Vercel/Neon 页面完成，本项目不代替用户接受这些步骤。

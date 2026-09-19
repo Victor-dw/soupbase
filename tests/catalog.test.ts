@@ -2,8 +2,8 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { mkdtemp, mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { tmpdir } from "node:os";
-import examples from "../content/examples/index.json";
-const example = examples[0];
+import doorbell from "../content/puzzles/zh/doorbell.json";
+const example = { ...doorbell, id: "test-story" };
 import { readCatalog } from "../scripts/catalog";
 
 let root: string;
@@ -15,15 +15,23 @@ beforeAll(async () => {
   delete process.env.DATABASE_URL;
 });
 
-describe("example catalog", () => {
-  it("validates languages and requires answer examples", async () => {
+describe("puzzle catalog", () => {
+  it("validates languages and allows optional question fixtures", async () => {
     const file = path.join(root, "zh", "test-story.json");
     await writeFile(file, JSON.stringify({ ...example, language: "en" }));
     await expect(readCatalog(root)).rejects.toThrow("language does not match");
     await writeFile(file, JSON.stringify({ ...example, golden_questions: [] }));
-    await expect(readCatalog(root)).rejects.toThrow("at least four");
+    expect((await readCatalog(root))[0].puzzle.golden_questions).toEqual([]);
     await writeFile(file, JSON.stringify(example));
-    expect((await readCatalog(root))[0].id).toBe("community-zh-test-story");
+    expect((await readCatalog(root))[0].id).toBe("test-story");
+  });
+
+  it("rejects duplicate IDs across languages", async () => {
+    const file = path.join(root, "en", "duplicate.json");
+    await writeFile(file, JSON.stringify({ ...example, language: "en" }));
+    await expect(readCatalog(root)).rejects.toThrow("duplicate puzzle id");
+    const { unlink } = await import("node:fs/promises");
+    await unlink(file);
   });
 
   it("syncs idempotently, versions edits, and preserves old revisions and disabled status", async () => {
@@ -70,15 +78,16 @@ describe("example catalog", () => {
     await query(
       sql`INSERT INTO visitors (id,secret_hash,expires_at) VALUES ('archive-test-visitor','archive-test-secret',now()+interval '1 day')`,
     );
+    const originalRevision = (await puzzle("sample-1")).revision;
     await query(
-      sql`INSERT INTO sessions (id,visitor_id,puzzle_id,revision_id) VALUES ('archive-test-session','archive-test-visitor','sample-1','sample-1-v1')`,
+      sql`INSERT INTO sessions (id,visitor_id,puzzle_id,revision_id) VALUES ('archive-test-session','archive-test-visitor','sample-1',${originalRevision})`,
     );
     await archiveCatalog(["sample-1"]);
     expect((await puzzle("sample-1")).visibility).toBe("archived");
     expect(
       (await session("archive-test-session", "archive-test-visitor"))
         .revision_id,
-    ).toBe("sample-1-v1");
+    ).toBe(originalRevision);
     expect(
       await query(
         sql`SELECT id FROM puzzles WHERE id='sample-1' AND visibility='curated'`,

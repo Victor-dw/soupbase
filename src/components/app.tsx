@@ -480,7 +480,7 @@ export default function App({ locale }: { locale: "zh" | "en" }) {
           {!standalone && (
             <aside>
               <div className="section-heading">
-                {t("示例题目", "EXAMPLE PUZZLES")}{" "}
+                {t("题库", "PUZZLES")}{" "}
                 <span>
                   {String(
                     puzzles.filter((p) => p.language === locale).length,
@@ -1188,7 +1188,7 @@ export default function App({ locale }: { locale: "zh" | "en" }) {
                             {p.visibility === "private"
                               ? t("私有", "Private")
                               : p.visibility === "curated"
-                                ? t("示例", "Example")
+                                ? t("题库", "Catalog")
                                 : t("链接分享", "Unlisted")}
                           </span>
                         </div>

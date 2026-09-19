@@ -2,7 +2,7 @@ import "server-only";
 import { sql, type SQL } from "drizzle-orm";
 import { readFile, mkdir } from "node:fs/promises";
 import path from "node:path";
-import { publicContent, type PuzzleInput } from "@/shared/puzzle";
+import { publicContent } from "@/shared/puzzle";
 export { sql };
 type Row = Record<string, any>;
 type Database = { execute: (query: SQL) => Promise<{ rows: Row[] }> };
@@ -55,11 +55,8 @@ export async function query<T = Row>(s: SQL): Promise<T[]> {
   return (await state.soupDb!.execute(s)).rows as T[];
 }
 async function seedDirect() {
-  const { default: examples } =
-    await import("../../content/examples/index.json");
-  for (const [i, p] of (examples as PuzzleInput[]).entries()) {
-    const id = `sample-${i + 1}`,
-      rev = `${id}-v1`;
+  const { readCatalog } = await import("../../scripts/catalog");
+  for (const { id, revision: rev, puzzle: p } of await readCatalog()) {
     await state.soupDb!.execute(
       sql`INSERT INTO puzzles (id,visibility,revision) VALUES (${id},'curated',${rev}) ON CONFLICT DO NOTHING`,
     );

@@ -1,0 +1,46 @@
+{
+  "id": "sample-4",
+  "schema_version": "1.0",
+  "language": "en",
+  "title": "The silent doorbell",
+  "surface": "Lin pressed the doorbell. There was no sound inside. A few seconds later, Zhou opened the door. Zhou had neither seen Lin outside nor heard his voice. How did Zhou know someone had arrived?",
+  "solution": "Zhou cannot hear. The doorbell is connected to a flashing light indoors rather than a chime. Zhou saw the light flash when Lin pressed the button, so he knew someone was at the door. He did not know who the visitor was before opening it.",
+  "facts": [
+    {
+      "id": "f1",
+      "text": "Zhou cannot hear.",
+      "required": false
+    },
+    {
+      "id": "f2",
+      "text": "The button triggers a flashing indoor light, not a sound.",
+      "required": true
+    },
+    {
+      "id": "f3",
+      "text": "Zhou saw the flashing light and knew a visitor had arrived.",
+      "required": true
+    }
+  ],
+  "unknowns": [
+    "The reason for the visit is not specified.",
+    "Zhou’s age is not specified."
+  ],
+  "character_claims": [],
+  "hints": [
+    "A doorbell is a way of sending a signal.",
+    "A signal does not have to be a sound.",
+    "Something lit up inside the house."
+  ],
+  "difficulty": "easy",
+  "tags": [
+    "Everyday",
+    "Perspective"
+  ],
+  "source": {
+    "kind": "original",
+    "author": "Soupbase",
+    "note": "Soupbase-authored example, prepared with AI assistance; dedicated under CC0 1.0. See content/LICENSE.md."
+  },
+  "golden_questions": []
+}

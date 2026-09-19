@@ -6,6 +6,6 @@ const catalog = await readCatalog();
 await syncCatalog(catalog);
 await archiveCatalog(archived);
 console.log(
-  `Synced ${catalog.length} additional examples. Existing games keep their revisions.`,
+  `Synced ${catalog.length} puzzles. Existing games keep their revisions.`,
 );
 process.exit(0);

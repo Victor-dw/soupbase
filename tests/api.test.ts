@@ -73,7 +73,8 @@ vi.mock("ai", () => ({
 import { handle } from "../src/server/api";
 import { query, sql } from "../src/server/db";
 import { hostDecision } from "../src/server/model";
-import examples from "../content/examples/index.json";
+import doorbell from "../content/puzzles/zh/doorbell.json";
+const { id: _puzzleId, ...puzzleContent } = doorbell;
 const origin = "http://localhost:3100";
 class Client {
   cookie = "";
@@ -120,7 +121,7 @@ describe("resource access and gameplay", () => {
   it("exposes only public puzzle fields", async () => {
     const r = await player.request("puzzles");
     expect(r.status).toBe(200);
-    expect(r.data).toHaveLength(4);
+    expect(r.data).toHaveLength(6);
     const text = JSON.stringify(r.data);
     expect(text).not.toContain("solution");
     expect(text).not.toContain("facts");
@@ -128,11 +129,11 @@ describe("resource access and gameplay", () => {
   });
   it("creates privately and refuses permission fields", async () => {
     const bad = await author.request("puzzles", "POST", {
-      ...examples[0],
+      ...puzzleContent,
       visibility: "curated",
     });
     expect(bad.status).toBe(422);
-    const r = await author.request("puzzles", "POST", examples[0]);
+    const r = await author.request("puzzles", "POST", puzzleContent);
     expect(r.status).toBe(201);
     puzzleId = r.data.id;
     management = r.data.manageKey;
@@ -140,7 +141,7 @@ describe("resource access and gameplay", () => {
     expect(
       (await author.request("puzzles/" + puzzleId + "/export")).data.content
         .solution,
-    ).toBe(examples[0].solution);
+    ).toBe(puzzleContent.solution);
   });
   it("separates sharing from management", async () => {
     const r = await author.request(`puzzles/${puzzleId}/share`, "POST", {});
@@ -180,7 +181,7 @@ describe("resource access and gameplay", () => {
     const b = await player.request(`sessions/${sessionId}/hints`, "POST", req);
     expect(a.data.hints).toHaveLength(1);
     expect(b.data.hints).toHaveLength(1);
-    expect(JSON.stringify(b.data)).not.toContain(examples[0].hints[2]);
+    expect(JSON.stringify(b.data)).not.toContain(puzzleContent.hints[2]);
   });
   it("keeps BYOK per request, persists no canary, and deduplicates successful calls", async () => {
     const body = {
@@ -205,7 +206,7 @@ describe("resource access and gameplay", () => {
     expect(r.data.turns[0]).not.toHaveProperty("metadata");
     expect(r.data.turns[0].response.answers.answer.choice).toBe("yes");
     expect(r.data.turns[0].response.confidence.answer).toBe(0.99);
-    expect(JSON.stringify(r.data)).not.toContain(examples[0].solution);
+    expect(JSON.stringify(r.data)).not.toContain(puzzleContent.solution);
     expect(JSON.stringify(r.data)).not.toContain('"request":');
     expect((await player.request(`sessions/${sessionId}/trace`)).status).toBe(
       409,
@@ -277,7 +278,7 @@ describe("resource access and gameplay", () => {
   });
   it("fixes existing games to their original revision", async () => {
     const old = await author.request("puzzles/" + puzzleId + "/export");
-    const changed = { ...examples[0], solution: "A new solution." };
+    const changed = { ...puzzleContent, solution: "A new solution." };
     expect(
       (
         await author.request("puzzles/" + puzzleId, "PATCH", {
@@ -287,11 +288,11 @@ describe("resource access and gameplay", () => {
       ).status,
     ).toBe(200);
     const r = await player.request(`sessions/${sessionId}/reveal`, "POST", {});
-    expect(r.data.solution).toBe(examples[0].solution);
+    expect(r.data.solution).toBe(puzzleContent.solution);
     const trace = await player.request(`sessions/${sessionId}/trace`);
     expect(trace.status).toBe(200);
     expect(trace.data.turns[0].trace.request.state.reference.solution).toBe(
-      examples[0].solution,
+      puzzleContent.solution,
     );
     expect(trace.data.turns[0].trace.request.state.player_input).toBe(
       "他看到了灯吗？",
@@ -353,7 +354,7 @@ describe("resource access and gameplay", () => {
         await author.request(
           "puzzles",
           "POST",
-          examples[0],
+          puzzleContent,
           undefined,
           "https://evil.example",
         )
@@ -376,7 +377,7 @@ describe("resource access and gameplay", () => {
             new NextRequest(`${domain}/api/puzzles`, {
               method: "POST",
               headers: { origin: incoming, "content-type": "application/json" },
-              body: JSON.stringify(examples[0]),
+              body: JSON.stringify(puzzleContent),
             }),
             ["puzzles"],
           );
@@ -405,7 +406,7 @@ describe("resource access and gameplay", () => {
   it("uses four choices, ignores legacy relevance hints, and normalizes old history", async () => {
     const client = new Client();
     const r = await client.request("puzzles", "POST", {
-      ...examples[0],
+      ...puzzleContent,
       irrelevant_topics: ["门铃是否发声"],
     });
     expect(r.status).toBe(201);
@@ -543,7 +544,7 @@ describe("explanation submission", () => {
       expect(r.data.status).toBe("active");
       expect(r.data.turns.at(-1).decision).toBe("incomplete");
       expect(r.data.solution).toBeUndefined();
-      expect(JSON.stringify(r.data)).not.toContain(examples[0].facts[1].text);
+      expect(JSON.stringify(r.data)).not.toContain(puzzleContent.facts[1].text);
       expect(
         (
           await client.request(
@@ -577,7 +578,7 @@ describe("explanation submission", () => {
     expect(r.status).toBe(200);
     expect(mocked.guessHistory).toEqual([]);
     expect(r.data.status).toBe("solved");
-    expect(r.data.solution).toBe(examples[0].solution);
+    expect(r.data.solution).toBe(puzzleContent.solution);
     const restored = await client.request(`sessions/${id}`);
     expect(restored.data.status).toBe("solved");
     const trace = await client.request(`sessions/${id}/trace`);

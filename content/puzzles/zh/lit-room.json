@@ -1,0 +1,45 @@
+{
+  "id": "sample-2",
+  "schema_version": "1.0",
+  "language": "zh",
+  "title": "一直亮着的房间",
+  "surface": "晚上，林远看到对面房间的灯亮着，就放心地关上手机睡了。他没有和任何人联系，房间里也没有人。为什么？",
+  "solution": "林远在自己家用手机远程控制无人居住的工作室灯光，测试智能插座是否恢复连接。工作室正好在对面楼，可以从家中看到。看到灯亮说明远程控制成功。他不认识附近其他住户，也没有向任何人求助。",
+  "facts": [
+    {
+      "id": "f1",
+      "text": "对面的房间是林远无人居住的工作室。",
+      "required": true
+    },
+    {
+      "id": "f2",
+      "text": "林远用手机远程控制工作室灯光，测试智能插座连接。",
+      "required": true
+    },
+    {
+      "id": "f3",
+      "text": "看到灯亮说明测试成功，因此他放心睡觉。",
+      "required": true
+    }
+  ],
+  "unknowns": [
+    "没有设定智能插座此前断线的原因。"
+  ],
+  "character_claims": [],
+  "hints": [
+    "那盏灯的作用不是告诉他有人在家。",
+    "他在手机上做了一次测试。",
+    "他能控制对面的灯。"
+  ],
+  "difficulty": "medium",
+  "tags": [
+    "日常",
+    "科技"
+  ],
+  "source": {
+    "kind": "original",
+    "author": "Soupbase 示例",
+    "note": "Soupbase-authored example, prepared with AI assistance; dedicated under CC0 1.0. See content/LICENSE.md."
+  },
+  "golden_questions": []
+}

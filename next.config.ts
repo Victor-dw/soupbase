@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 const config: NextConfig = {
   output: "standalone",
+  outputFileTracingIncludes: { "/api/*": ["./content/puzzles/**/*.json"] },
   turbopack: { root: process.cwd() },
   devIndicators: false,
   serverExternalPackages: ["@electric-sql/pglite", "pg"],

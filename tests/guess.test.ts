@@ -1,7 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { gradeGuess, guessQuestions } from "../src/server/guess";
 import { puzzleSchema } from "../src/shared/puzzle";
-import examples from "../content/examples/index.json";
+import doorbell from "../content/puzzles/zh/doorbell.json";
+const { id: _puzzleId, ...puzzleContent } = doorbell;
 const ids = ["f2", "f3"];
 const complete = {
   f2: { choice: "supported" },
@@ -20,7 +21,7 @@ describe("conservative completion gate", () => {
 
   it("requires every required fact plus a coherent explanation", () => {
     expect(
-      Object.keys(guessQuestions(puzzleSchema.parse(examples[0]))),
+      Object.keys(guessQuestions(puzzleSchema.parse(puzzleContent))),
     ).toEqual(["f2", "f3", "coherence"]);
     expect(gradeGuess(ids, complete, confidence)).toBe("solved");
     expect(

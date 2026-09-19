@@ -1,0 +1,40 @@
+{
+  "id": "sample-3",
+  "schema_version": "1.0",
+  "language": "zh",
+  "title": "空白的最后一页",
+  "surface": "读到一本书的最后一页时，女孩笑了。那一页一个字也没有，而她之前一直很紧张。发生了什么？",
+  "solution": "女孩在检查自己刚装订好的练字作品集，担心最后一张纸背面的墨迹透到末页。她不是在读故事，而是逐页检查成品。翻到末页发现纸面干净、没有透墨，于是松了一口气笑了。",
+  "facts": [
+    {
+      "id": "f1",
+      "text": "这是女孩自己的练字作品集，她在检查装订成品。",
+      "required": true
+    },
+    {
+      "id": "f2",
+      "text": "她担心墨迹透到末页，发现末页干净说明没有透墨。",
+      "required": true
+    }
+  ],
+  "unknowns": [
+    "没有设定女孩的年龄。"
+  ],
+  "character_claims": [],
+  "hints": [
+    "她担心的不是故事结局。",
+    "这本书与她自己的劳动有关。",
+    "她检查的是纸张上的痕迹。"
+  ],
+  "difficulty": "hard",
+  "tags": [
+    "日常",
+    "文字"
+  ],
+  "source": {
+    "kind": "original",
+    "author": "Soupbase 示例",
+    "note": "Soupbase-authored example, prepared with AI assistance; dedicated under CC0 1.0. See content/LICENSE.md."
+  },
+  "golden_questions": []
+}

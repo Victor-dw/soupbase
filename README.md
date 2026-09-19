@@ -55,9 +55,9 @@ Vercel 部署通过 Neon 集成创建 PostgreSQL 并自动注入连接串；域�
 
 BYOK 请求会经过部署者服务器，服务器能读取 Key；开源并不意味着浏览器直连供应商。本应用代码不持久化或主动记录模型 Key。更完整的信任边界见[安全说明](docs/security.md)。站点 Key 模式没有内置消费限额，额度管理由部署者负责。
 
-## 示例题目
+## 题库
 
-公开发行内容包括三道中文原创示例和对应英文版本。基础示例位于 `content/examples/index.json`，补充英文示例位于 `content/puzzles/`，一题一个 JSON。题目格式由 `src/shared/puzzle.ts` 定义。
+题目统一存放在 `content/puzzles/zh/` 和 `content/puzzles/en/`，一题一个 JSON。每个文件包含固定的 `id` 和 `src/shared/puzzle.ts` 定义的题目字段。新增题目时添加文件，再执行下面的校验和同步命令；修改题目时保留原有 `id`，已有游戏继续使用原来的题目版本。
 
 ```sh
 npm run content:check

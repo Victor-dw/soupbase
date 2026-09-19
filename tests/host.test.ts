@@ -2,7 +2,8 @@ import { describe, expect, it } from "vitest";
 import { hostQuestions, hostState } from "../src/server/host";
 import { puzzleSchema } from "../src/shared/puzzle";
 import comparison from "./fixtures/host-prompt.json";
-import examples from "../content/examples/index.json";
+import doorbell from "../content/puzzles/zh/doorbell.json";
+const { id: _puzzleId, ...puzzleContent } = doorbell;
 
 describe("four-answer host", () => {
   it("uses the evaluated facts-first prompt without changing its rules or criteria", () => {
@@ -10,7 +11,7 @@ describe("four-answer host", () => {
   });
   it("imports legacy puzzles without carrying forward manually defined relevance", () => {
     const p = puzzleSchema.parse({
-      ...examples[0],
+      ...puzzleContent,
       irrelevant_topics: ["门铃是否发声"],
       golden_questions: [
         { question: "旧问题", expected: "unknown", reason: "旧格式" },

@@ -46,9 +46,9 @@ There are no accounts, anonymous daily quotas, moderation queues or Star-based u
 
 BYOK requests pass through the deployment server, which can read the key. The application does not persist or intentionally log it; open source does not prove a remote deployment runs identical code. See [security boundaries](docs/security.md).
 
-## Example puzzles
+## Puzzle catalog
 
-The release includes three original Chinese examples and their English versions. Base examples are in `content/examples/index.json`; additional English examples are individual JSON files in `content/puzzles/`.
+Puzzles live in `content/puzzles/zh/` and `content/puzzles/en/`, one JSON file per puzzle. Each file has a stable `id` and the fields defined in `src/shared/puzzle.ts`. Add a file, run `npm run content:check`, then `npm run content:sync`. Keep the same ID when editing; existing games retain their original revision.
 
 
 ## Development
