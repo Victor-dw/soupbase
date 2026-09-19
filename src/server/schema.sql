@@ -5,7 +5,6 @@ CREATE TABLE IF NOT EXISTS grants (visitor_id text REFERENCES visitors(id) ON DE
 CREATE TABLE IF NOT EXISTS sessions (id text PRIMARY KEY, visitor_id text NOT NULL REFERENCES visitors(id), puzzle_id text NOT NULL REFERENCES puzzles(id) ON DELETE CASCADE, revision_id text NOT NULL REFERENCES revisions(id), status text NOT NULL DEFAULT 'active', hint_count integer NOT NULL DEFAULT 0, pending_id text, lease_until timestamptz, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now());
 CREATE TABLE IF NOT EXISTS turns (id text PRIMARY KEY, session_id text NOT NULL REFERENCES sessions(id) ON DELETE CASCADE, request_id text NOT NULL, kind text NOT NULL, input text NOT NULL, decision text, status text NOT NULL DEFAULT 'pending', metadata jsonb, created_at timestamptz NOT NULL DEFAULT now(), UNIQUE(session_id,request_id));
 CREATE TABLE IF NOT EXISTS hint_requests (session_id text REFERENCES sessions(id) ON DELETE CASCADE, request_id text NOT NULL, PRIMARY KEY(session_id,request_id));
-CREATE TABLE IF NOT EXISTS feedback (id text PRIMARY KEY, session_id text NOT NULL REFERENCES sessions(id) ON DELETE CASCADE, comment text NOT NULL, created_at timestamptz NOT NULL DEFAULT now());
 CREATE INDEX IF NOT EXISTS sessions_visitor ON sessions(visitor_id);
 CREATE INDEX IF NOT EXISTS turns_session ON turns(session_id,created_at);
 CREATE INDEX IF NOT EXISTS puzzles_visibility ON puzzles(visibility);

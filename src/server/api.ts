@@ -96,14 +96,11 @@ export async function handle(req: NextRequest, paths: string[]) {
     if (v && "token" in v) newToken = v.token;
     const body = mutation ? await readBody(req) : {};
     if (area === "library" && !id && method === "GET") {
-      if (!v) return reply({ puzzles: [], sessions: [] });
+      if (!v) return reply({ puzzles: [] });
       const puzzles = await query(
         sql`SELECT DISTINCT p.id,p.revision,p.visibility,r.public_content FROM puzzles p JOIN revisions r ON r.id=p.revision LEFT JOIN grants g ON g.puzzle_id=p.id AND g.visitor_id=${v.id} AND g.role='manage' AND g.version=p.manage_version WHERE NOT p.disabled AND (p.owner_id=${v.id} OR g.visitor_id IS NOT NULL)`,
       );
-      const sessions = await query(
-        sql`SELECT s.id,s.status,r.public_content->>'title' AS title FROM sessions s JOIN puzzles p ON p.id=s.puzzle_id JOIN revisions r ON r.id=s.revision_id WHERE s.visitor_id=${v.id} AND NOT p.disabled ORDER BY s.updated_at DESC LIMIT 30`,
-      );
-      return reply({ puzzles: puzzles.map(publicPuzzle), sessions });
+      return reply({ puzzles: puzzles.map(publicPuzzle) });
     }
     if (
       area === "access" &&
@@ -304,20 +301,6 @@ export async function handle(req: NextRequest, paths: string[]) {
           throw e;
         }
       }
-    }
-    if (area === "feedback" && method === "POST" && !id) {
-      if (!v) throw new AppError("not_found", 404);
-      const b = z
-        .strictObject({
-          sessionId: idSchema,
-          comment: z.string().trim().min(1).max(1000),
-        })
-        .parse(body);
-      await session(b.sessionId, v.id);
-      await query(
-        sql`INSERT INTO feedback(id,session_id,comment) VALUES (${uid()},${b.sessionId},${b.comment})`,
-      );
-      return reply({ ok: true });
     }
     throw new AppError("not_found", 404);
   } catch (e) {

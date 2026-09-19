@@ -437,30 +437,6 @@ p {
   color: var(--muted);
   align-self: center;
 }
-.game-tools {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  font-size: 13px;
-  margin: 10px -6px;
-}
-.game-tools > div {
-  display: flex;
-  gap: 14px;
-}
-.game-tools button {
-  padding: 5px 6px;
-}
-.story-foot {
-  display: flex;
-  justify-content: space-between;
-  font-size: 12px;
-  color: var(--muted);
-  margin-top: 40px;
-}
-.story-foot button {
-  padding: 0;
-}
 .solution {
   margin: 28px 0;
   border-top: 1px solid var(--accent);
@@ -539,7 +515,6 @@ p {
 .field input,
 .field textarea,
 .field select,
-.feedback textarea,
 .link-box input {
   width: 100%;
   border: 1px solid var(--line);
@@ -581,14 +556,7 @@ dd {
   margin: 0;
   font-family: ui-monospace, monospace;
 }
-.form-pair {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 20px;
-}
-.form-pair .field {
-  margin-bottom: 0;
-}
+
 .fact-row {
   display: flex;
   gap: 10px;
@@ -663,23 +631,7 @@ summary {
 .library-row span {
   display: block;
 }
-.session-row {
-  justify-content: space-between;
-}
-.feedback {
-  margin-top: 18px;
-}
-.feedback label {
-  font-size: 13px;
-  color: var(--muted);
-}
-.feedback textarea {
-  display: block;
-  margin: 10px 0;
-}
-.feedback button {
-  float: right;
-}
+
 .header-right .active {
   color: var(--fg);
 }
@@ -721,17 +673,9 @@ summary {
   .document {
     padding: 30px 22px 55px;
   }
-  .form-pair {
-    grid-template-columns: 1fr;
-  }
-  .form-pair .field {
-    margin-top: 15px;
-  }
+
   .notice {
     padding: 10px 20px;
-  }
-  .game-tools > div {
-    gap: 7px;
   }
   .library-row {
     gap: 12px;
@@ -806,18 +750,6 @@ summary {
 .result-title {
   margin: 8px 0;
   font-size: 24px;
-}
-.game-tools .solve-action,
-.game-tools .active {
-  color: var(--accent);
-}
-@media (max-width: 600px) {
-  .game-tools {
-    flex-wrap: wrap;
-  }
-  .game-tools > div {
-    flex-wrap: wrap;
-  }
 }
 
 /* Keep the input in place while the story and conversation grow. */
@@ -894,30 +826,9 @@ summary {
   min-height: 48px;
   max-height: 160px;
 }
-.game-dock .game-tools {
-  margin: 5px 0 0;
-  flex-wrap: wrap;
-}
-.game-dock .game-tools > div {
-  flex-wrap: wrap;
-  gap: 8px;
-}
 .game-dock .confirmation {
   margin: 8px 0;
   padding: 12px;
-}
-.playing .story-foot {
-  flex-shrink: 0;
-  margin: 5px 0 0;
-}
-.playing .feedback {
-  max-height: 30%;
-  overflow-y: auto;
-  flex-shrink: 0;
-  margin: 8px 0 0;
-}
-.playing .feedback textarea {
-  max-height: 90px;
 }
 @media (max-width: 760px) {
   .playing .workspace {
@@ -963,13 +874,6 @@ summary {
   .composer-meta {
     font-size: 11px;
   }
-  .game-dock .game-tools {
-    font-size: 12px;
-    gap: 0;
-  }
-  .game-dock .game-tools > div {
-    gap: 2px;
-  }
   .game-dock .guess-help {
     font-size: 12px;
     margin-bottom: 3px;
@@ -978,9 +882,6 @@ summary {
 @media (max-height: 520px) {
   .game-dock {
     max-height: 65%;
-  }
-  .playing .story-foot {
-    display: none;
   }
 }
 .conversation-heading {

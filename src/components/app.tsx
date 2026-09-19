@@ -10,7 +10,6 @@ type Config = {
 };
 type Library = {
   puzzles: PublicPuzzle[];
-  sessions: { id: string; title: string; status: string }[];
 };
 type View = "play" | "create" | "about" | "settings";
 const blank: PuzzleInput = {
@@ -96,7 +95,7 @@ export default function App({ locale }: { locale: "zh" | "en" }) {
     [puzzles, setPuzzles] = useState<PublicPuzzle[]>([]),
     [selected, setSelected] = useState<PublicPuzzle>(),
     [game, setGame] = useState<Game>(),
-    [lib, setLib] = useState<Library>({ puzzles: [], sessions: [] });
+    [lib, setLib] = useState<Library>({ puzzles: [] });
   const [busy, setBusy] = useState(false),
     [loading, setLoading] = useState(true),
     [error, setError] = useState(""),
@@ -119,9 +118,7 @@ export default function App({ locale }: { locale: "zh" | "en" }) {
     }>(),
     [manageLink, setManageLink] = useState(""),
     [shareLink, setShareLink] = useState(""),
-    [deleteConfirm, setDeleteConfirm] = useState(false),
-    [feedback, setFeedback] = useState(false),
-    [feedbackText, setFeedbackText] = useState("");
+    [deleteConfirm, setDeleteConfirm] = useState(false);
   const gameScroll = useRef<HTMLDivElement>(null),
     questionInput = useRef<HTMLTextAreaElement>(null),
     initial = useRef(false);
@@ -405,7 +402,7 @@ export default function App({ locale }: { locale: "zh" | "en" }) {
           汤底 <span>soupbase</span>
         </a>
         <nav aria-label={t("主导航", "Main navigation")}>
-          {(["play", "create", "about"] as View[]).map((v, i) => (
+          {(["play", "create", "about"] as View[]).map((v) => (
             <button
               key={v}
               className={view === v ? "active" : ""}
@@ -908,48 +905,6 @@ export default function App({ locale }: { locale: "zh" | "en" }) {
                       </div>
                     )}
                   </div>
-                )}
-                {game && (
-                  <div className="story-foot">
-                    <button onClick={() => setFeedback(!feedback)}>
-                      {t("反馈判题问题", "Report an answer")}
-                    </button>
-                  </div>
-                )}
-                {feedback && game && (
-                  <form
-                    className="feedback"
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      void run(async () => {
-                        await api("feedback", "POST", {
-                          sessionId: game.id,
-                          comment: feedbackText,
-                        });
-                        setFeedback(false);
-                        setFeedbackText("");
-                        setNotice(
-                          t("反馈已保存，谢谢。", "Feedback saved. Thank you."),
-                        );
-                      });
-                    }}
-                  >
-                    <label>
-                      {t(
-                        "哪里不对？请勿填写个人信息。",
-                        "What went wrong? Please omit personal information.",
-                      )}
-                      <textarea
-                        required
-                        maxLength={1000}
-                        value={feedbackText}
-                        onChange={(e) => setFeedbackText(e.target.value)}
-                      />
-                    </label>
-                    <button className="outline" disabled={busy}>
-                      {t("提交反馈", "Send feedback")}
-                    </button>
-                  </form>
                 )}
               </>
             ) : (
