@@ -1,70 +1,50 @@
 # 部署
 
-## Vercel 一键部署
+## Vercel + Neon PostgreSQL
 
-### 维护者：绑定公开仓库
+可以在 Vercel 内直接创建 PostgreSQL。当前入口是 Marketplace 的 Neon 集成；旧 Vercel Postgres 产品已迁移到 Neon，不需要使用旧的 `@vercel/postgres` SDK。本项目使用标准 PostgreSQL 连接。
 
-在公开仓库根目录运行（参数是你自己的 GitHub 仓库，不是 API Key）：
+### 一键部署
 
-```sh
-npm run deploy:button -- OWNER/REPOSITORY
-```
+1. 点击 README 的部署按钮。部署流程会引导连接 Neon 集成、创建数据库，并自动注入 `DATABASE_URL`。选择套餐时确认其费用。
+2. 选择唯一的功能设置 `AI_ACCESS_MODE`：`byok_only`、`site_only` 或 `both`。
+3. 站点 Key + BYOK 按钮默认 `both`，要求你填自己的 `AI_GATEWAY_API_KEY`；仅 BYOK 按钮默认 `byok_only`，无需站点 Key。
+4. Vercel 使用 Node 24 和仓库中的 `vercel.json`。构建成功后自动建表、初始化示例、同步 Git 题库。
+5. 域名取当前请求 origin，生产修改请求必须同源；无需额外的域名环境变量。自定义域名在 Vercel Domains 中管理。
 
-脚本更新中英文 README，生成「站点 Key + BYOK」和「仅 BYOK」两个按钮。链接只包含仓库地址、所需变量名、非敏感的模式默认值和文档地址，不读取 `.env.local`，也不携带 Key 或数据库密码。提交更新后的 README 即可。
+Neon 集成产品描述采用[官方 Vercel/Neon 模板](https://github.com/neondatabase-labs/vercel-marketplace-neon)的 Deploy Button 配置。集成的创建、计费和授权由 Vercel/Neon 页面完成，本项目不代替用户接受这些步骤。
 
-### 部署者：准备 PostgreSQL 和填入配置
+### 你的站点已有 Vercel 项目
 
-1. 准备独立 PostgreSQL 数据库，可使用 Neon、Supabase 或其他兼容服务；复制连接串，按供应商要求保留 SSL 参数。初始化需要建表权限。
-2. 点击 README 中适合自己的按钮，授权 Vercel 创建仓库/项目，选择项目名。
-3. 在部署表单填写下面的变量。`APP_ORIGIN` 必须对应最终访问域名，例如项目名为 `your-soup` 时填写 `https://your-soup.vercel.app`；如该名字不可用，以实际分配域名为准。不要加末尾斜杠。
-4. Node.js 24、安装 `npm ci`；`vercel.json` 已设置构建命令 `npm run vercel-build`。
-5. 生产构建成功后，构建脚本自动执行建表、基础示例初始化、Git 题库同步。数据库不可达会使部署失败，不会把原始数据库错误或连接串打印到构建日志。
-6. 上线后检查提问、创作、分享和揭底。增加自定义域名时更新 `APP_ORIGIN` 并重新部署；网站只能接受与所配置 origin 一致的修改请求。
+在项目 Storage / Marketplace 中添加 Neon PostgreSQL 并连接当前项目，确认 `DATABASE_URL` 已注入。在 Settings → Environment Variables 设置 `AI_ACCESS_MODE=both` 和 `AI_GATEWAY_API_KEY`，再重新部署。
 
-“一键”指 Vercel 克隆和部署流程；仍需你授权账户、准备数据库并填写凭证。本项目不会自动购买或创建数据库。
-
-### 环境变量
-
-| 变量 | 必需性 / 内容 |
+| 变量 | 来源与用途 |
 | --- | --- |
-| `DATABASE_URL` | 必填，PostgreSQL 连接串；仅服务端使用 |
-| `APP_ORIGIN` | 必填，正式站点的完整 HTTPS origin，无末尾斜杠 |
-| `AI_ACCESS_MODE` | `both`：站点 Key 和 BYOK；`site_only`：仅站点；`byok_only`：仅用户 Key |
-| `AI_GATEWAY_API_KEY` | `both` / `site_only` 必填，你自己的 Vercel AI Gateway Key；仅服务端使用 |
-| `UPLOADS_ENABLED` | 默认 `true`；`false` 禁止新增私有题目，已有分享不受影响 |
-| `ENABLE_GUESS` | 默认 `true`，启用还原判题 |
-| `JEV_MODEL` | 默认 `typesafe-ai/jev` |
-| `DATABASE_SETUP` | 生产默认执行数据库初始化/同步；`false` 跳过，`true` 可为隔离预览库显式开启 |
-| `NEXT_PUBLIC_REPOSITORY_URL` | 可选，公开 GitHub 仓库地址，用于页面的自愿 Star 入口 |
+| `AI_ACCESS_MODE` | 唯一功能设置，默认 `byok_only` |
+| `AI_GATEWAY_API_KEY` | 站点模式的服务端凭证，手动填在 Vercel，不进入仓库 |
+| `DATABASE_URL` | Neon 集成自动注入的服务端数据库连接串；也接受其他 PostgreSQL |
 
-**你自己部署并提供额度：选择站点 Key + BYOK，填 `AI_ACCESS_MODE=both` 和自己的 `AI_GATEWAY_API_KEY`。** 玩家仍可在网站设置中选择自己的 Key；不同来源不会自动回退。仅 BYOK 按钮不要求部署者填模型 Key。
+除了模式，另外两个是运行所需凭证，并不是功能开关。模型固定为 Jev，还原判断与私有创作/分享始终启用；不提供网页文件上传和 JSON 导入导出。
 
-### Key 只放 Vercel，不进仓库
+### 密钥与更新
 
-部署后也可进入项目 **Settings → Environment Variables** 添加/更新 `AI_GATEWAY_API_KEY`，选择 Production，保存后重新部署。数据库连接串同样处理。有敏感变量选项时可将两者标记为 Sensitive。
-
-也可以在自己的终端使用 Vercel CLI 的交互输入：
+密钥只填在 Vercel Environment Variables；更新后重新部署。可用交互式 CLI：
 
 ```sh
 vercel link
 vercel env add AI_GATEWAY_API_KEY production
-vercel env add DATABASE_URL production
 vercel --prod
 ```
 
-不要把真实值作为 shell 命令参数、写进 README、`vercel.json`、Deploy Button URL 或 `NEXT_PUBLIC_*` 变量。仓库的 `.env.example` 只有空值；真实 `.env*`、`.vercel/` 和本地数据库均被 Git 忽略。分享/管理凭证也不能提交 Git。
+不要将真实凭证写进按钮 URL、README、`vercel.json` 或公开客户端变量。真实 `.env*`、`.vercel/`、本地数据库均被 Git 和 Vercel 上传配置排除。
 
-### 预览、更新与数据库
+每个 Vercel 环境必须连接自己的数据库；构建会初始化并同步该数据库，缺少连接串会明确失败。Preview 使用隔离的 Neon 数据库/分支，不可向外部 PR 暴露生产连接和站点 Key。新建或复用分支按集成的实际配置检查，不假定已自动隔离。
 
-- Production 和 Preview 分开配置数据库和 Key。外部 PR 构建不得获得生产凭证。
-- Preview 默认不执行数据库初始化；若要可用的预览环境，提供其独立的 `DATABASE_URL`、匹配的 `APP_ORIGIN`，并设 `DATABASE_SETUP=true`。缺少必填变量的 Vercel 构建会明确失败。
-- Production 默认每次构建后同步题库。初始建表可重复执行，不替代未来的正式版本化迁移。发布到同一数据库的部署应串行，迁移前备份。
-- 设置 `DATABASE_SETUP=false` 后，需要在可信环境手动执行 `npm run db:migrate` 和 `npm run content:sync`。
-- 构建脚本初始化数据库后，若 Vercel 的后续发布阶段失败，数据库变更不会自动回滚。
-- 函数和数据库选择相近区域。API 使用 Node runtime，模型超时 20 秒，路由 maxDuration 30 秒。
-- 站点 Key 没有内置匿名消费限额；需要停用站点额度时切回 `byok_only` 并重新部署。
+建表操作可重复执行，但不是未来结构升级的版本化迁移方案。发布到同一数据库时串行部署并提前备份；若数据库同步完成后 Vercel 后续发布失败，数据库变更不会自动回滚。非 Vercel 部署手动执行 `npm run db:migrate`、`npm run content:sync`。
 
-官方说明：[部署按钮环境变量](https://vercel.com/docs/deploy-button/environment-variables)、[环境变量管理](https://vercel.com/docs/environment-variables)。
+维护者更换 GitHub 仓库后，可运行 `npm run deploy:button -- OWNER/REPOSITORY` 更新双语 README 按钮。按钮只携带非敏感配置。
+
+参考：[Vercel Postgres](https://vercel.com/docs/postgres)、[Marketplace Storage](https://vercel.com/docs/marketplace-storage)、[部署按钮环境变量](https://vercel.com/docs/deploy-button/environment-variables)。
 
 ## 腾讯云 Docker
 
@@ -86,7 +66,6 @@ migrate 服务先初始化数据库并同步 Git 题库；app 使用 Next standa
 
 升级先备份，手动运行新的迁移，再切换应用版本。不要依赖重新执行旧的一次性迁移容器自动升级未来数据库结构。备份例如通过 `docker compose exec -T db pg_dump -U soupbase soupbase` 导出到受保护位置，并保存到另一机器；定期恢复演练。
 
-设置 `UPLOADS_ENABLED`、`ENABLE_GUESS` 和 `JEV_MODEL` 可调整实例行为。`NEXT_PUBLIC_REPOSITORY_URL` 在镜像构建时传入，修改后需重新构建。
 
 ## 运行数据
 

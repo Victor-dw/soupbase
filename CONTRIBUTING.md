@@ -8,7 +8,7 @@ Keep public and secret puzzle DTOs separate. Changes to credential handling or a
 
 ## Puzzle contributions
 
-See [the bilingual puzzle guide](content/puzzles/README.md) and [JSON template](content/puzzle.template.json). Add one file per puzzle and run `npm run content:check`. Website uploads may remain disabled; GitHub contributions are reviewed through pull requests. No database or model key is required.
+See [the bilingual puzzle guide](content/puzzles/README.md) and [JSON template](content/puzzle.template.json). Add one file per puzzle and run `npm run content:check`. The website only offers private authoring and link sharing; public contributions are reviewed through GitHub pull requests. No database or model key is required.
 
 ## Maintainer commands
 

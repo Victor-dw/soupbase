@@ -7,18 +7,30 @@ if (!/^[\w.-]+\/[\w.-]+$/.test(slug)) {
 }
 const repo = `https://github.com/${slug}`;
 function button(site) {
-  const env = ["DATABASE_URL", "APP_ORIGIN", "AI_ACCESS_MODE"];
+  const env = ["AI_ACCESS_MODE"];
   if (site) env.push("AI_GATEWAY_API_KEY");
   const url = new URL("https://vercel.com/new/clone");
   url.searchParams.set("repository-url", repo);
   url.searchParams.set("env", env.join(","));
+  // Same native Neon product descriptor used by the official Vercel/Neon template.
+  url.searchParams.set(
+    "products",
+    JSON.stringify([
+      {
+        type: "integration",
+        integrationSlug: "neon",
+        productSlug: "neon",
+        protocol: "storage",
+      },
+    ]),
+  );
   url.searchParams.set(
     "envDefaults",
     JSON.stringify({ AI_ACCESS_MODE: site ? "both" : "byok_only" }),
   );
   url.searchParams.set(
     "envDescription",
-    "Enter your PostgreSQL URL and exact HTTPS site origin. Site mode also requires your own Vercel AI Gateway key. Never put secrets in Git or this URL.",
+    "Connect Neon Postgres in the deployment flow. Choose AI_ACCESS_MODE; site mode also requires your own Vercel AI Gateway key.",
   );
   url.searchParams.set("envLink", `${repo}/blob/HEAD/docs/deployment.md`);
   return `[![Deploy with Vercel](https://vercel.com/button)](${url})`;

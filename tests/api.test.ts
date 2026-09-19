@@ -114,10 +114,7 @@ beforeAll(async () => {
   await mkdir(".data", { recursive: true });
   process.env.LOCAL_DB_PATH = ".data/test-" + randomUUID();
   delete process.env.DATABASE_URL;
-  process.env.APP_ORIGIN = origin;
   process.env.AI_ACCESS_MODE = "byok_only";
-  process.env.AI_MOCK = "false";
-  process.env.ENABLE_GUESS = "true";
 });
 describe("resource access and gameplay", () => {
   it("exposes only public puzzle fields", async () => {
@@ -336,6 +333,29 @@ describe("resource access and gameplay", () => {
       (await author.request("puzzles", "POST", { data: "a".repeat(66000) }))
         .status,
     ).toBe(413);
+  });
+  it("accepts deployment domains without configuration but rejects foreign origins", async () => {
+    vi.stubEnv("NODE_ENV", "production");
+    try {
+      for (const domain of [
+        "https://soup-preview.vercel.app",
+        "https://soup.example",
+      ]) {
+        for (const incoming of [domain, "https://evil.example"]) {
+          const response = await handle(
+            new NextRequest(`${domain}/api/puzzles`, {
+              method: "POST",
+              headers: { origin: incoming, "content-type": "application/json" },
+              body: JSON.stringify(examples[0]),
+            }),
+            ["puzzles"],
+          );
+          expect(response.status).toBe(incoming === domain ? 201 : 403);
+        }
+      }
+    } finally {
+      vi.unstubAllEnvs();
+    }
   });
   it("rejects malformed provider results instead of inventing a story answer", () => {
     expect(hostDecision({ choice: "yes" })).toBe("yes");
@@ -607,13 +627,5 @@ describe("explanation submission", () => {
     expect(r.data.status).toBe("revealed");
     expect(r.data.turns.at(-1).status).toBe("cancelled");
     mocked.delay = 0;
-  });
-  it("honors the deployment opt-out without calling the model", async () => {
-    const { client, id } = await fresh();
-    process.env.ENABLE_GUESS = "false";
-    const count = mocked.keys.length;
-    expect((await guess(client, id)).status).toBe(403);
-    expect(mocked.keys.length).toBe(count);
-    process.env.ENABLE_GUESS = "true";
   });
 });

@@ -34,16 +34,6 @@ export async function judge(
   kind: string,
   key: string,
 ) {
-  if (config().mock)
-    return {
-      decision: kind === "guess" ? "uncertain" : "irrelevant",
-      metadata: {
-        provider: "mock",
-        model: "mock",
-        confidence: null,
-        confidenceThreshold: kind === "guess" ? CONFIDENCE_THRESHOLD : null,
-      },
-    };
   const gateway = createGateway({
     apiKey: key,
     fetch: async (url, init) => {

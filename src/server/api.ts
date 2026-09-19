@@ -70,11 +70,10 @@ export async function handle(req: NextRequest, paths: string[]) {
     const method = req.method,
       mutation = method !== "GET";
     if (mutation) {
-      const expected = process.env.APP_ORIGIN || req.nextUrl.origin;
+      const expected = req.nextUrl.origin;
       const incoming = req.headers.get("origin");
       const localAllowed =
         process.env.NODE_ENV !== "production" &&
-        !process.env.APP_ORIGIN &&
         [
           "http://localhost:" + req.nextUrl.port,
           "http://127.0.0.1:" + req.nextUrl.port,
@@ -138,7 +137,6 @@ export async function handle(req: NextRequest, paths: string[]) {
     }
     if (area === "puzzles") {
       if (!id && method === "POST") {
-        if (!config().uploads) throw new AppError("uploads_disabled", 403);
         const p = puzzleSchema.parse(body),
           pid = uid(),
           revision = uid(),
@@ -237,14 +235,10 @@ export async function handle(req: NextRequest, paths: string[]) {
         const b = requestSchema.parse(body);
         if ([...b.text].length > (action === "guess" ? 3000 : 500))
           throw new AppError("too_large", 413);
-        if (action === "guess" && !config().guess)
-          throw new AppError("guess_disabled", 403);
-        const key = config().mock
-          ? "mock-only"
-          : selectKey(
-              b.credentialSource,
-              req.headers.get("authorization")?.replace(/^Bearer /, "") || null,
-            );
+        const key = selectKey(
+          b.credentialSource,
+          req.headers.get("authorization")?.replace(/^Bearer /, "") || null,
+        );
         const [old] = await query(
           sql`SELECT * FROM turns WHERE session_id=${id} AND request_id=${b.clientRequestId}`,
         );

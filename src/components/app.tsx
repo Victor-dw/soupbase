@@ -5,10 +5,7 @@ import { Confidence } from "./confidence";
 type Config = {
   mode: string;
   model: string;
-  uploads: boolean;
-  mock: boolean;
   repository: string | null;
-  guess: boolean;
   version: string;
 };
 type Library = {
@@ -270,7 +267,7 @@ export default function App({ locale }: { locale: "zh" | "en" }) {
             secret: token,
           });
           const p = await api<PublicPuzzle>("puzzles/" + id);
-          if (access === "manage" && c.uploads) await editPuzzle(p);
+          if (access === "manage") await editPuzzle(p);
           else await openPuzzle(p);
           await refreshLibrary();
         } else if (url.searchParams.has("session"))
@@ -318,8 +315,7 @@ export default function App({ locale }: { locale: "zh" | "en" }) {
     const submission = (guess ? explanation : question).trim();
     if (!submission) return;
     await run(async () => {
-      if (!cfg?.mock && source === "byok" && !key)
-        throw new Error("key_required");
+      if (source === "byok" && !key) throw new Error("key_required");
       const g = game || (await start());
       if (!g) return;
       const updated = await api<Game>(
@@ -354,17 +350,6 @@ export default function App({ locale }: { locale: "zh" | "en" }) {
   async function copy(value: string) {
     await navigator.clipboard.writeText(value);
     setNotice(t("已复制。", "Copied."));
-  }
-  function download() {
-    const blob = new Blob([JSON.stringify(draft, null, 2)], {
-        type: "application/json",
-      }),
-      url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "soupbase-puzzle.json";
-    a.click();
-    URL.revokeObjectURL(url);
   }
   function cleanDraft() {
     return {
@@ -420,34 +405,32 @@ export default function App({ locale }: { locale: "zh" | "en" }) {
           汤底 <span>soupbase</span>
         </a>
         <nav aria-label={t("主导航", "Main navigation")}>
-          {(["play", "create", "about"] as View[])
-            .filter((v) => v !== "create" || cfg?.uploads === true)
-            .map((v, i) => (
-              <button
-                key={v}
-                className={view === v ? "active" : ""}
-                onClick={() => {
-                  if (v === "create") {
-                    setEditing(undefined);
-                    setDraft({ ...blank, language: locale });
-                    setManageLink("");
-                    setShareLink("");
-                  }
-                  navigate(v);
-                }}
-              >
-                {
-                  {
-                    play: standalone
-                      ? t("返回题库", "Back to puzzles")
-                      : t("题库", "Puzzles"),
-                    create: t("创作", "Create"),
-                    about: t("关于", "About"),
-                    settings: "",
-                  }[v]
+          {(["play", "create", "about"] as View[]).map((v, i) => (
+            <button
+              key={v}
+              className={view === v ? "active" : ""}
+              onClick={() => {
+                if (v === "create") {
+                  setEditing(undefined);
+                  setDraft({ ...blank, language: locale });
+                  setManageLink("");
+                  setShareLink("");
                 }
-              </button>
-            ))}
+                navigate(v);
+              }}
+            >
+              {
+                {
+                  play: standalone
+                    ? t("返回题库", "Back to puzzles")
+                    : t("题库", "Puzzles"),
+                  create: t("创作", "Create"),
+                  about: t("关于", "About"),
+                  settings: "",
+                }[v]
+              }
+            </button>
+          ))}
         </nav>
         <div className="header-right">
           {cfg?.repository && (
@@ -489,14 +472,6 @@ export default function App({ locale }: { locale: "zh" | "en" }) {
       {notice && (
         <div className="notice" role="status">
           {notice}
-        </div>
-      )}
-      {cfg?.mock && (
-        <div className="notice">
-          {t(
-            "离线测试模式 · 回复是固定模拟结果，不是 Jev 判题。",
-            "Offline test mode · Responses are simulated, not Jev judgments.",
-          )}
         </div>
       )}
       {view === "play" ? (
@@ -745,7 +720,7 @@ export default function App({ locale }: { locale: "zh" | "en" }) {
                       onSubmit={submit}
                     >
                       <div className="composer-toolbar">
-                        {cfg?.guess && (
+                        {
                           <button
                             type="button"
                             disabled={busy}
@@ -770,7 +745,7 @@ export default function App({ locale }: { locale: "zh" | "en" }) {
                               ? t("还原模式 ⇄", "Explain ⇄")
                               : t("提问模式 ⇄", "Ask ⇄")}
                           </button>
-                        )}
+                        }
                         <button
                           type="button"
                           disabled={
@@ -1119,14 +1094,14 @@ export default function App({ locale }: { locale: "zh" | "en" }) {
                     "The host answers Yes, No, Irrelevant, or Cannot determine yet. Jev judges relevance from the solution; missing key information or questions needing clarification can receive Cannot determine yet. Confidence below 0.70 shows a low-confidence hint without changing the answer. The model can make mistakes.",
                   )}
                 </p>
-                {cfg?.uploads && (
+                {
                   <p className="muted">
                     {t(
-                      "投稿默认私有。开启分享后，持有链接的人可以游玩和揭底。管理链接相当于密码，请妥善保存。本站不需要账号；清除浏览器 Cookie 会丢失游戏访问权。",
-                      "Submissions are private by default. Anyone with a sharing link can play and reveal the answer. Management links act as passwords. No account is required; clearing cookies loses access to saved games.",
+                      "创作题目默认私有。开启分享后，持有链接的人可以游玩和揭底。管理链接相当于密码，请妥善保存。本站不需要账号；清除浏览器 Cookie 会丢失游戏访问权。",
+                      "Created puzzles are private by default. Anyone with a sharing link can play and reveal the answer. Management links act as passwords. No account is required; clearing cookies loses access to saved games.",
                     )}
                   </p>
-                )}
+                }
                 {cfg?.repository ? (
                   <a
                     className="text-link"
@@ -1147,7 +1122,7 @@ export default function App({ locale }: { locale: "zh" | "en" }) {
               </section>
             </>
           )}
-          {view === "create" && cfg?.uploads && !creating && (
+          {view === "create" && !creating && (
             <>
               <h1>{t("创作", "Create")}</h1>
               <p className="muted">
@@ -1169,7 +1144,7 @@ export default function App({ locale }: { locale: "zh" | "en" }) {
               >
                 {t("新建题目", "New puzzle")}
               </button>
-              {cfg?.uploads && (
+              {
                 <section>
                   <h2>{t("我的作品", "My puzzles")}</h2>
                   {lib.puzzles.length ? (
@@ -1210,10 +1185,10 @@ export default function App({ locale }: { locale: "zh" | "en" }) {
                     </p>
                   )}
                 </section>
-              )}
+              }
             </>
           )}
-          {view === "create" && cfg?.uploads && creating && (
+          {view === "create" && creating && (
             <>
               <button className="text-link" onClick={() => navigate("create")}>
                 {t("← 返回作品", "← Back to puzzles")}
@@ -1232,38 +1207,6 @@ export default function App({ locale }: { locale: "zh" | "en" }) {
                   "Keep the mystery in the story and the facts in the solution. Save privately, then invite others with a sharing link. Your puzzle stays out of the public catalog.",
                 )}
               </p>
-              <div className="actions">
-                <label className="outline file-label">
-                  {t("导入 JSON", "Import JSON")}
-                  <input
-                    type="file"
-                    accept="application/json,.json"
-                    onChange={(e) => {
-                      const f = e.target.files?.[0];
-                      if (!f) return;
-                      void run(async () => {
-                        if (f.size > 65536) throw new Error("too_large");
-                        const { puzzleSchema } =
-                          await import("@/shared/puzzle");
-                        try {
-                          setDraft(
-                            puzzleSchema.parse(JSON.parse(await f.text())),
-                          );
-                        } catch {
-                          throw new Error("validation_failed");
-                        }
-                        setNotice(
-                          t("已导入，保存后生效。", "Imported. Save to apply."),
-                        );
-                      });
-                      e.target.value = "";
-                    }}
-                  />
-                </label>
-                <button className="outline" type="button" onClick={download}>
-                  {t("导出 JSON（含汤底）", "Export JSON (includes answer)")}
-                </button>
-              </div>
               <form onSubmit={save} className="author-form">
                 <label className="field">
                   {t("标题", "Title")}

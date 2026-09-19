@@ -610,12 +610,6 @@ dd {
 .fact-row > button {
   font-size: 20px;
 }
-.file-label {
-  cursor: pointer;
-}
-.file-label input {
-  display: none;
-}
 details {
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);

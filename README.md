@@ -9,18 +9,18 @@
 <!-- vercel-deploy:start -->
 站点 Key + BYOK（部署时填写自己的 Key）：
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fspoonnotfound%2Fsoupbase&env=DATABASE_URL%2CAPP_ORIGIN%2CAI_ACCESS_MODE%2CAI_GATEWAY_API_KEY&envDefaults=%7B%22AI_ACCESS_MODE%22%3A%22both%22%7D&envDescription=Enter+your+PostgreSQL+URL+and+exact+HTTPS+site+origin.+Site+mode+also+requires+your+own+Vercel+AI+Gateway+key.+Never+put+secrets+in+Git+or+this+URL.&envLink=https%3A%2F%2Fgithub.com%2Fspoonnotfound%2Fsoupbase%2Fblob%2FHEAD%2Fdocs%2Fdeployment.md)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fspoonnotfound%2Fsoupbase&env=AI_ACCESS_MODE%2CAI_GATEWAY_API_KEY&products=%5B%7B%22type%22%3A%22integration%22%2C%22integrationSlug%22%3A%22neon%22%2C%22productSlug%22%3A%22neon%22%2C%22protocol%22%3A%22storage%22%7D%5D&envDefaults=%7B%22AI_ACCESS_MODE%22%3A%22both%22%7D&envDescription=Connect+Neon+Postgres+in+the+deployment+flow.+Choose+AI_ACCESS_MODE%3B+site+mode+also+requires+your+own+Vercel+AI+Gateway+key.&envLink=https%3A%2F%2Fgithub.com%2Fspoonnotfound%2Fsoupbase%2Fblob%2FHEAD%2Fdocs%2Fdeployment.md)
 
 仅 BYOK（无需站点 Key）：
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fspoonnotfound%2Fsoupbase&env=DATABASE_URL%2CAPP_ORIGIN%2CAI_ACCESS_MODE&envDefaults=%7B%22AI_ACCESS_MODE%22%3A%22byok_only%22%7D&envDescription=Enter+your+PostgreSQL+URL+and+exact+HTTPS+site+origin.+Site+mode+also+requires+your+own+Vercel+AI+Gateway+key.+Never+put+secrets+in+Git+or+this+URL.&envLink=https%3A%2F%2Fgithub.com%2Fspoonnotfound%2Fsoupbase%2Fblob%2FHEAD%2Fdocs%2Fdeployment.md)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fspoonnotfound%2Fsoupbase&env=AI_ACCESS_MODE&products=%5B%7B%22type%22%3A%22integration%22%2C%22integrationSlug%22%3A%22neon%22%2C%22productSlug%22%3A%22neon%22%2C%22protocol%22%3A%22storage%22%7D%5D&envDefaults=%7B%22AI_ACCESS_MODE%22%3A%22byok_only%22%7D&envDescription=Connect+Neon+Postgres+in+the+deployment+flow.+Choose+AI_ACCESS_MODE%3B+site+mode+also+requires+your+own+Vercel+AI+Gateway+key.&envLink=https%3A%2F%2Fgithub.com%2Fspoonnotfound%2Fsoupbase%2Fblob%2FHEAD%2Fdocs%2Fdeployment.md)
 <!-- vercel-deploy:end -->
 
 ## 功能
 
 - 四种主持回答：是、不是、不重要、暂时无法判断；展示模型原生 confidence。
 - 中文 / 英文界面、深浅主题、游戏记录、主动揭晓。
-- 创作和 JSON 导入导出；题目默认私有，分享链接可撤销，不进入公共题库。
+- 网页创作；题目默认私有，分享链接可撤销，不进入公共题库。
 - 支持 BYOK、站点提供 Key，或两者并存。
 - 无账号系统；不包含匿名每日配额、内容审核或 Star 解锁。
 
@@ -39,19 +39,17 @@ npm run dev
 
 默认 BYOK：在右上角设置中输入 **Vercel AI Gateway Key**。Key 只保留在页面内存，刷新后需要重填；调用会产生供应商费用。没有 Key 也可以浏览题目、创作、查看提示和揭底。
 
-更换端口或域名时同步修改 `APP_ORIGIN`。生产环境需要 PostgreSQL 和显式配置的 `APP_ORIGIN`，见[部署指南](docs/deployment.md)。
+Vercel 部署通过 Neon 集成创建 PostgreSQL 并自动注入连接串；域名自动取当前请求，无需手填。见[部署指南](docs/deployment.md)。
 
-## 凭证与创作配置
+## 凭证配置
 
 | 配置 | 作用 |
 | --- | --- |
 | `AI_ACCESS_MODE=byok_only` | 默认：玩家使用自己的 Key |
 | `AI_ACCESS_MODE=site_only` | 使用服务端 `AI_GATEWAY_API_KEY` |
 | `AI_ACCESS_MODE=both` | 玩家选择站点 Key 或 BYOK，不自动回退 |
-| `UPLOADS_ENABLED=true` | 开启私有创作、JSON 导入和链接分享 |
-| `UPLOADS_ENABLED=false` | 关闭新增题目入口和 API；已有题目与分享仍保留 |
-| `ENABLE_GUESS=false` | 关闭提交还原 |
-| `NEXT_PUBLIC_REPOSITORY_URL` | 可选 GitHub 仓库链接，显示自愿 Star 入口 |
+
+唯一功能设置是 `AI_ACCESS_MODE`。站点 Key 保存在服务端 `AI_GATEWAY_API_KEY`；`DATABASE_URL` 由集成提供。网页只支持创作和私有链接分享，不提供文件上传/导入导出，也不会自动发布到公共题库。
 
 BYOK 请求会经过部署者服务器，服务器能读取 Key；开源并不意味着浏览器直连供应商。本应用代码不持久化或主动记录模型 Key。更完整的信任边界见[安全说明](docs/security.md)。站点 Key 模式没有内置消费限额，额度管理由部署者负责。
 

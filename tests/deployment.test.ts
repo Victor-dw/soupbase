@@ -17,7 +17,10 @@ describe("Vercel deployment", () => {
         {
           cwd: dir,
           encoding: "utf8",
-          env: { NODE_ENV: "test", AI_GATEWAY_API_KEY: "synthetic-secret-not-for-urls" },
+          env: {
+            NODE_ENV: "test",
+            AI_GATEWAY_API_KEY: "synthetic-secret-not-for-urls",
+          },
         },
       );
       expect(result.status).toBe(0);
@@ -27,6 +30,15 @@ describe("Vercel deployment", () => {
         ...text.matchAll(/\]\((https:\/\/vercel.com\/new\/clone[^)]+)\)/g),
       ].map((m) => new URL(m[1]));
       expect(urls).toHaveLength(2);
+      expect(urls[1].searchParams.get("env")).toBe("AI_ACCESS_MODE");
+      expect(JSON.parse(urls[0].searchParams.get("products")!)).toEqual([
+        {
+          type: "integration",
+          integrationSlug: "neon",
+          productSlug: "neon",
+          protocol: "storage",
+        },
+      ]);
       expect(urls[0].searchParams.get("repository-url")).toBe(
         "https://github.com/example/soup",
       );
@@ -47,28 +59,25 @@ describe("Vercel deployment", () => {
 
   it.each([
     [{}, "DATABASE_URL"],
-    [{ DATABASE_URL: "postgres://synthetic" }, "APP_ORIGIN"],
     [
-      {
-        DATABASE_URL: "postgres://synthetic",
-        APP_ORIGIN: "https://soup.example/",
-      },
-      "APP_ORIGIN",
+      { DATABASE_URL: "postgres://synthetic", AI_ACCESS_MODE: "both" },
+      "AI_GATEWAY_API_KEY",
     ],
     [
-      {
-        DATABASE_URL: "postgres://synthetic",
-        APP_ORIGIN: "https://soup.example",
-        AI_ACCESS_MODE: "both",
-      },
-      "AI_GATEWAY_API_KEY",
+      { DATABASE_URL: "postgres://synthetic", AI_ACCESS_MODE: "invalid" },
+      "Invalid AI_ACCESS_MODE",
     ],
   ])(
     "rejects incomplete Vercel configuration before building",
     (extra, expected) => {
       const result = spawnSync(process.execPath, ["scripts/vercel-build.mjs"], {
         encoding: "utf8",
-        env: { NODE_ENV: "production", VERCEL: "1", VERCEL_ENV: "production", ...extra },
+        env: {
+          NODE_ENV: "production",
+          VERCEL: "1",
+          VERCEL_ENV: "production",
+          ...extra,
+        },
       });
       expect(result.status).toBe(1);
       expect(result.stderr).toContain(expected);

@@ -26,7 +26,7 @@ The schema in `src/shared/puzzle.ts` is authoritative. Keep filenames stable: re
 3. 提交 PR，说明来源、署名、使用许可以及测试问题 / submit a PR with provenance and permissions.
 4. CI 自动验证格式；维护者检查内容、许可和预期答案后合并 / CI validates structure; a maintainer reviews content, permissions, and expected answers.
 
-只贡献自己有权公开的内容；汤底会随文件公开。原创题请明确同意按 `content/LICENSE.md` 的 CC0 方式提供；改编或授权题必须说明允许在此公开和再分发的依据。网页创建关闭不影响 GitHub PR 投稿。
+只贡献自己有权公开的内容；汤底会随文件公开。原创题请明确同意按 `content/LICENSE.md` 的 CC0 方式提供；改编或授权题必须说明允许在此公开和再分发的依据。公共题库只通过 GitHub PR 贡献；网页创作仅用于私有分享。
 Only submit content you have permission to publish, including its solution. State CC0 dedication for original contributions in the PR. Adapted/licensed content needs explicit redistribution permission and attribution; linking a source alone is not permission.
 
 CI 不调用付费模型，也不保证 Jev 的判题准确率。模型实测由维护者另行运行。

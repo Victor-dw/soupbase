@@ -1,11 +1,7 @@
 import { spawnSync } from "node:child_process";
 
-// Production clones initialize their own database. Previews must opt in with
-// an isolated database; never give untrusted PR builds production credentials.
-const setup =
-  process.env.DATABASE_SETUP === "true" ||
-  (process.env.VERCEL_ENV === "production" &&
-    process.env.DATABASE_SETUP !== "false");
+// Each Vercel environment must use its own integration-provisioned database.
+const setup = process.env.VERCEL === "1";
 function fail(message) {
   console.error(message);
   process.exit(1);
@@ -13,15 +9,6 @@ function fail(message) {
 if (process.env.VERCEL === "1") {
   if (!process.env.DATABASE_URL)
     fail("Set DATABASE_URL in Vercel Environment Variables.");
-  try {
-    const u = new URL(process.env.APP_ORIGIN || "");
-    if (u.protocol !== "https:" || u.origin !== process.env.APP_ORIGIN)
-      throw new Error();
-  } catch {
-    fail(
-      "Set APP_ORIGIN to your exact HTTPS site origin, without a trailing slash.",
-    );
-  }
   const mode = process.env.AI_ACCESS_MODE || "byok_only";
   if (!["byok_only", "site_only", "both"].includes(mode))
     fail("Invalid AI_ACCESS_MODE.");
@@ -29,8 +16,6 @@ if (process.env.VERCEL === "1") {
     fail(
       "Site access requires AI_GATEWAY_API_KEY in Vercel Environment Variables.",
     );
-  if (process.env.AI_MOCK === "true")
-    fail("AI_MOCK must be disabled for deployment.");
 }
 if (setup && !process.env.DATABASE_URL)
   fail("Database setup requires DATABASE_URL.");

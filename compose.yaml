@@ -17,8 +17,6 @@ services:
     build:
       context: .
       target: migrate
-      args:
-        NEXT_PUBLIC_REPOSITORY_URL: ${NEXT_PUBLIC_REPOSITORY_URL:-}
     environment:
       DATABASE_URL: postgresql://soupbase:${POSTGRES_PASSWORD}@db:5432/soupbase
     depends_on:
@@ -30,18 +28,11 @@ services:
     build:
       context: .
       target: runner
-      args:
-        NEXT_PUBLIC_REPOSITORY_URL: ${NEXT_PUBLIC_REPOSITORY_URL:-}
     restart: unless-stopped
     environment:
       DATABASE_URL: postgresql://soupbase:${POSTGRES_PASSWORD}@db:5432/soupbase
-      APP_ORIGIN: https://${DOMAIN:?Set DOMAIN}
       AI_ACCESS_MODE: ${AI_ACCESS_MODE:-byok_only}
-      UPLOADS_ENABLED: ${UPLOADS_ENABLED:-true}
-      JEV_MODEL: ${JEV_MODEL:-typesafe-ai/jev}
-      ENABLE_GUESS: ${ENABLE_GUESS:-true}
       AI_GATEWAY_API_KEY: ${AI_GATEWAY_API_KEY:-}
-      NEXT_PUBLIC_REPOSITORY_URL: ${NEXT_PUBLIC_REPOSITORY_URL:-}
     depends_on:
       migrate:
         condition: service_completed_successfully

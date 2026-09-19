@@ -9,11 +9,11 @@ A text-focused, bilingual lateral-thinking puzzle game hosted by Jev. Ask questi
 <!-- vercel-deploy:start -->
 Site key + BYOK (enter your own key during deployment):
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fspoonnotfound%2Fsoupbase&env=DATABASE_URL%2CAPP_ORIGIN%2CAI_ACCESS_MODE%2CAI_GATEWAY_API_KEY&envDefaults=%7B%22AI_ACCESS_MODE%22%3A%22both%22%7D&envDescription=Enter+your+PostgreSQL+URL+and+exact+HTTPS+site+origin.+Site+mode+also+requires+your+own+Vercel+AI+Gateway+key.+Never+put+secrets+in+Git+or+this+URL.&envLink=https%3A%2F%2Fgithub.com%2Fspoonnotfound%2Fsoupbase%2Fblob%2FHEAD%2Fdocs%2Fdeployment.md)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fspoonnotfound%2Fsoupbase&env=AI_ACCESS_MODE%2CAI_GATEWAY_API_KEY&products=%5B%7B%22type%22%3A%22integration%22%2C%22integrationSlug%22%3A%22neon%22%2C%22productSlug%22%3A%22neon%22%2C%22protocol%22%3A%22storage%22%7D%5D&envDefaults=%7B%22AI_ACCESS_MODE%22%3A%22both%22%7D&envDescription=Connect+Neon+Postgres+in+the+deployment+flow.+Choose+AI_ACCESS_MODE%3B+site+mode+also+requires+your+own+Vercel+AI+Gateway+key.&envLink=https%3A%2F%2Fgithub.com%2Fspoonnotfound%2Fsoupbase%2Fblob%2FHEAD%2Fdocs%2Fdeployment.md)
 
 BYOK only (no site key required):
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fspoonnotfound%2Fsoupbase&env=DATABASE_URL%2CAPP_ORIGIN%2CAI_ACCESS_MODE&envDefaults=%7B%22AI_ACCESS_MODE%22%3A%22byok_only%22%7D&envDescription=Enter+your+PostgreSQL+URL+and+exact+HTTPS+site+origin.+Site+mode+also+requires+your+own+Vercel+AI+Gateway+key.+Never+put+secrets+in+Git+or+this+URL.&envLink=https%3A%2F%2Fgithub.com%2Fspoonnotfound%2Fsoupbase%2Fblob%2FHEAD%2Fdocs%2Fdeployment.md)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fspoonnotfound%2Fsoupbase&env=AI_ACCESS_MODE&products=%5B%7B%22type%22%3A%22integration%22%2C%22integrationSlug%22%3A%22neon%22%2C%22productSlug%22%3A%22neon%22%2C%22protocol%22%3A%22storage%22%7D%5D&envDefaults=%7B%22AI_ACCESS_MODE%22%3A%22byok_only%22%7D&envDescription=Connect+Neon+Postgres+in+the+deployment+flow.+Choose+AI_ACCESS_MODE%3B+site+mode+also+requires+your+own+Vercel+AI+Gateway+key.&envLink=https%3A%2F%2Fgithub.com%2Fspoonnotfound%2Fsoupbase%2Fblob%2FHEAD%2Fdocs%2Fdeployment.md)
 <!-- vercel-deploy:end -->
 
 ## Run locally
@@ -31,17 +31,14 @@ Open [localhost:3000/en](http://localhost:3000/en). Local development uses PGlit
 
 The default is BYOK: enter a **Vercel AI Gateway key** in Settings. It is held in page memory and cleared on refresh. Model calls incur provider charges. Browsing, authoring, hints and revealing the solution do not need a model key.
 
-Vercel reads `vercel.json`; production builds initialize PostgreSQL and sync the catalog. Enter `DATABASE_URL`, your exact HTTPS `APP_ORIGIN`, and (for site access) `AI_GATEWAY_API_KEY` in the Vercel form or Project Settings → Environment Variables. Never put their values in Git or Deploy Button URLs. Preview environments require separate credentials and explicit database setup.
+The deployment buttons provision Neon Postgres inside Vercel and inject `DATABASE_URL`. Choose `AI_ACCESS_MODE` and enter your own `AI_GATEWAY_API_KEY` for site access. The origin is inferred from each request; no domain setting is needed. Builds initialize and sync the connected database. Preview environments must use isolated databases and credentials.
 
 ## Features and configuration
 
 - Chinese/English UI, light/dark themes, saved games, hints and explanation checks.
 - Four host answers: Yes, No, Irrelevant, Cannot determine yet, with native confidence.
-- Private authoring and JSON import/export. Sharing never publishes to the public catalog.
+- Private browser authoring and revocable link sharing; no file uploads or import/export. Sharing never publishes to the public catalog.
 - `AI_ACCESS_MODE`: `byok_only` (default), `site_only`, or `both`. Site access requires server-side `AI_GATEWAY_API_KEY`; credentials never silently fall back.
-- `UPLOADS_ENABLED=false` disables new puzzle creation; existing shares remain accessible.
-- `ENABLE_GUESS=false` disables explanation submissions.
-- `NEXT_PUBLIC_REPOSITORY_URL` enables an optional GitHub/Star link.
 
 There are no accounts, anonymous daily quotas, moderation queues or Star-based unlocks. Site-key usage budgets are the operator's responsibility.
 
