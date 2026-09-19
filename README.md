@@ -2,6 +2,8 @@
 
 一个以文字为中心的中英文海龟汤网站，由 Jev 担任主持人。支持提问、逐步提示、提交还原，以及私有创作和链接分享。
 
+模型使用 [TypeSafe AI](https://typesafe.ai/) 的 [Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev)，通过 Vercel AI Gateway（`typesafe-ai/jev`）调用。Jev 负责提问判定与还原评分，返回结构化选项、概率和置信度；网站据此展示回答和判定结果。
+
 [English](README.en.md) · [部署](docs/deployment.md) · [贡献题目](content/puzzles/README.md) · [模型与架构](docs/architecture.md) · [安全边界](docs/security.md)
 
 ## 部署到 Vercel

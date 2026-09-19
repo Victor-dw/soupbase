@@ -1096,6 +1096,20 @@ export default function App({ locale }: { locale: "zh" | "en" }) {
                   "Lateral-thinking puzzles leave something out. Ask questions to uncover what happened. Jev hosts the conversation.",
                 )}
               </p>
+              <p className="muted small">
+                {t(
+                  "模型由 TypeSafe AI 提供，用于回答判定和汤底还原评分。",
+                  "The model is provided by TypeSafe AI and powers question judgments and explanation grading.",
+                )}{" "}
+                <a
+                  className="text-link"
+                  href="https://typesafe.ai/blog/introducing-system-one-models-and-jev"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {t("了解 Jev ↗", "About Jev ↗")}
+                </a>
+              </p>
               <section>
                 <h2>{t("怎么玩", "How to play")}</h2>
                 <ol>
@@ -1560,7 +1574,14 @@ export default function App({ locale }: { locale: "zh" | "en" }) {
       <footer>
         <span>{t("一个故事，一些问题。", "A story, a few questions.")}</span>
         <span>
-          Jev × Soupbase{" "}
+          <a
+            href="https://typesafe.ai/blog/introducing-system-one-models-and-jev"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Jev by TypeSafe AI ↗
+          </a>{" "}
+          × Soupbase{" "}
           <span className="version">/ v{cfg?.version || "0.1.0"}</span>
         </span>
       </footer>

@@ -2,6 +2,8 @@
 
 A text-focused, bilingual lateral-thinking puzzle game hosted by Jev. Ask questions, reveal hints, submit an explanation, or create a private puzzle and share a revocable play link.
 
+Powered by [Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev) from [TypeSafe AI](https://typesafe.ai/), accessed through Vercel AI Gateway as `typesafe-ai/jev`. Jev evaluates player questions and explanations, returning structured choices, probabilities and confidence that the app uses to display answers and determine outcomes.
+
 [中文](README.md) · [Deployment](docs/deployment.md) · [Puzzle contributions](content/puzzles/README.md) · [Architecture](docs/architecture.md) · [Security](docs/security.md)
 
 ## Deploy to Vercel
