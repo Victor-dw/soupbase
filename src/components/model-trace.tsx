@@ -49,8 +49,8 @@ export function ModelTrace({
       </summary>
       <p className="muted small">
         {en
-          ? "Structured SDK inputs and selected response fields, including the solution and grading rules. Authentication headers are not recorded. Failed and older calls may have no record."
-          : "展示 SDK 请求参数与返回的结构化字段，包含汤底和判题规则，不记录鉴权头。失败或旧调用可能没有记录。"}
+          ? "See the puzzle and rules sent to the model, along with its answers. These are SDK records without API keys. Older or failed requests may have no record."
+          : "这里可以查看发给模型的题目、判题规则和返回结果（SDK 数据，不含 Key）。旧对话或失败的请求可能没有记录。"}
       </p>
       {busy && <p>{en ? "Loading…" : "读取中…"}</p>}
       {error && (

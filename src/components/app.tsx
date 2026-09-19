@@ -389,7 +389,7 @@ export default function App({ locale }: { locale: "zh" | "en" }) {
         setManageLink(link("manage", r.id, r.manageKey));
         setNotice(
           t(
-            "已私有保存。请保存下方管理链接。",
+            "题目已保存。请保管好下方的管理链接。",
             "Saved privately. Keep the management link below.",
           ),
         );
@@ -510,9 +510,12 @@ export default function App({ locale }: { locale: "zh" | "en" }) {
                   ))}
               </div>
               <div className="aside-note">
-                {t("只需要好奇心。", "Bring your curiosity.")}
+                {t("选一道题，开始提问。", "Choose a puzzle to begin.")}
                 <br />
-                {t("答案藏在问题里。", "The answer starts with a question.")}
+                {t(
+                  "猜到原因后，试着还原。",
+                  "Submit your explanation when ready.",
+                )}
               </div>
             </aside>
           )}
@@ -559,8 +562,8 @@ export default function App({ locale }: { locale: "zh" | "en" }) {
                       <p className="muted small">
                         {game.status === "solved"
                           ? t(
-                              "你的解释还原了故事的关键经过。",
-                              "Your explanation accounts for the key events.",
+                              "你猜到了故事的关键。",
+                              "You found the key to the story.",
                             )
                           : t(
                               "你选择了直接揭晓，本局已结束。",
@@ -626,13 +629,13 @@ export default function App({ locale }: { locale: "zh" | "en" }) {
                       !game?.turns.length &&
                       !game?.hints.length && (
                         <div className="empty">
-                          {t("故事到这里停住。", "The story stops here.")}
+                          {t(
+                            "你觉得发生了什么？",
+                            "What do you think happened?",
+                          )}
                           <br />
                           <span>
-                            {t(
-                              "接下来，轮到你提问。",
-                              "Your questions come next.",
-                            )}
+                            {t("先问一个问题吧。", "Start with a question.")}
                           </span>
                         </div>
                       )}
@@ -654,8 +657,8 @@ export default function App({ locale }: { locale: "zh" | "en" }) {
                                 ? turn.kind === "guess" &&
                                   turn.decision === "uncertain"
                                   ? t(
-                                      "暂时无法确认这份解释，可以补充后再提交，或继续提问。",
-                                      "I cannot confirm this explanation yet. Revise it or keep asking questions.",
+                                      "还不能确定。你可以补充解释，或继续提问。",
+                                      "Not sure yet. Add more detail or keep asking questions.",
                                     )
                                   : label(turn.decision)
                                 : turn.status === "pending"
@@ -796,7 +799,7 @@ export default function App({ locale }: { locale: "zh" | "en" }) {
                       {guess && (
                         <p id="guess-help" className="guess-help">
                           {t(
-                            "用自己的话说明：发生了什么，为什么会出现汤面中的现象。不必复述每个细节。",
+                            "说说发生了什么，解释题面中的疑点即可，不用重复所有细节。",
                             "Explain what happened and why the story unfolded this way, in your own words. You do not need every detail.",
                           )}
                         </p>
@@ -981,7 +984,7 @@ export default function App({ locale }: { locale: "zh" | "en" }) {
                 </p>
               </section>
               <section>
-                <h2>{t("由谁提供模型调用", "Model access")}</h2>
+                <h2>{t("API Key", "API key")}</h2>
                 <div className="choice-row">
                   {cfg?.mode !== "byok_only" && (
                     <label>
@@ -1026,12 +1029,7 @@ export default function App({ locale }: { locale: "zh" | "en" }) {
                         className="outline"
                         onClick={() => {
                           setKey("");
-                          setNotice(
-                            t(
-                              "Key 已从页面状态中清除。",
-                              "Key cleared from page state.",
-                            ),
-                          );
+                          setNotice(t("Key 已清除。", "Key cleared."));
                         }}
                       >
                         {t("清除 Key", "Clear key")}
@@ -1045,8 +1043,8 @@ export default function App({ locale }: { locale: "zh" | "en" }) {
                     </div>
                     <p className="muted small">
                       {t(
-                        "Key 仅保留在当前页面内存，完整刷新后需要重新输入。请求经过本站服务器临时转发，费用由你的 Vercel AI Gateway 账户承担。应用不把 Key 写入数据库、浏览器存储或日志。",
-                        "Your key stays in page memory and is cleared on a full reload. Requests pass through this server; usage is billed to your Vercel AI Gateway account. The app does not persist keys in its database, browser storage, or logs.",
+                        "刷新页面后需要重新输入 Key。调用会经过本站服务器，费用计入你的 Vercel AI Gateway 账户。本站代码不会将你的 Key 存入数据库、浏览器存储或日志。",
+                        "Reloading the page clears your key. Requests go through this server and are billed to your Vercel AI Gateway account. The app does not save your key in its database, browser storage or logs.",
                       )}
                     </p>
                   </>
@@ -1068,19 +1066,19 @@ export default function App({ locale }: { locale: "zh" | "en" }) {
                 )}
               </section>
               <section>
-                <h2>{t("透明说明", "Transparency")}</h2>
+                <h2>{t("关于模型", "About the model")}</h2>
                 <dl>
-                  <dt>{t("服务商", "Provider")}</dt>
+                  <dt>{t("调用服务", "API service")}</dt>
                   <dd>Vercel AI Gateway</dd>
                   <dt>{t("模型", "Model")}</dt>
                   <dd>{cfg?.model || "Jev"}</dd>
-                  <dt>{t("版本", "Version")}</dt>
+                  <dt>{t("网站版本", "App version")}</dt>
                   <dd>{cfg?.version}</dd>
                 </dl>
                 <p className="muted small">
                   {t(
-                    "服务器会临时读取 Key 和题目。服务商会收到判题上下文；其日志可能包含汤底。开源方便检查，但不能证明远程部署的所有行为。信任要求更高时，可以自行部署。",
-                    "The server temporarily reads your key and the puzzle. The provider receives the evaluation context, which may include the solution in its logs. Open source helps inspection but cannot prove every behavior of a remote deployment. You can self-host.",
+                    "判题时会把汤面、汤底和你的问题发给模型服务商。服务商可能保留这些请求。想自己管理 Key 和数据，可以下载源码自行部署。",
+                    "The model provider receives the story, solution and your question, and may retain these requests. You can self-host to manage your own key and data.",
                   )}
                 </p>
               </section>
@@ -1089,17 +1087,17 @@ export default function App({ locale }: { locale: "zh" | "en" }) {
           {view === "about" && (
             <>
               <div className="eyebrow">ABOUT / SOUPBASE</div>
-              <h1>{t("一段故事，一些问题。", "A story, a few questions.")}</h1>
+              <h1>{t("关于汤底", "About Soupbase")}</h1>
               <p>
                 {t(
-                  "海龟汤是一种横向思维游戏。你看到故事的表面，通过提问，找出被省略的经过。这里由 Jev 担任主持人。",
-                  "Lateral-thinking puzzles leave something out. Ask questions to uncover what happened. Jev hosts the conversation.",
+                  "海龟汤是一个猜故事的游戏。你先读到一段看似奇怪的故事，再通过提问找出原因。这里由 Jev 回答你的问题。",
+                  "Read a puzzling story, then ask questions to work out what happened. Jev answers your questions.",
                 )}
               </p>
               <p className="muted small">
                 {t(
-                  "模型由 TypeSafe AI 提供，用于回答判定和汤底还原评分。",
-                  "The model is provided by TypeSafe AI and powers question judgments and explanation grading.",
+                  "Jev 是 TypeSafe AI 的模型，负责回答问题、判断你是否猜对。",
+                  "Jev, a model from TypeSafe AI, answers questions and checks your explanation.",
                 )}{" "}
                 <a
                   className="text-link"
@@ -1127,30 +1125,25 @@ export default function App({ locale }: { locale: "zh" | "en" }) {
                   </li>
                   <li>
                     {t(
-                      "想明白后点击「我猜到了」提交完整解释，也可以选择直接揭晓。",
-                      "Use ‘I think I’ve solved it’ to submit your explanation, or choose to reveal the answer.",
+                      "猜到后切换到「还原」，写下你的解释。也可以直接揭晓答案。",
+                      "Switch to explanation mode when you have a solution, or reveal the answer.",
                     )}
                   </li>
                 </ol>
               </section>
               <section>
-                <h2>
-                  {t(
-                    "一个实验，也是一份开源作品",
-                    "An experiment, and an open-source project",
-                  )}
-                </h2>
+                <h2>{t("关于回答", "About the answers")}</h2>
                 <p>
                   {t(
-                    "主持人回答「是 / 不是 / 不重要 / 暂时无法判断」。Jev 根据汤底自行判断相关性；关键资料不足或问题需要澄清时，可回答「暂时无法判断」。Confidence 低于 0.70 时提示把握较低，不改变答案。模型也可能判断错误。",
-                    "The host answers Yes, No, Irrelevant, or Cannot determine yet. Jev judges relevance from the solution; missing key information or questions needing clarification can receive Cannot determine yet. Confidence below 0.70 shows a low-confidence hint without changing the answer. The model can make mistakes.",
+                    "Jev 会回答「是」「不是」「不重要」或「暂时无法判断」。题目没交代清楚，或问题有歧义时，它可能无法判断。回答不一定都对；觉得不对可以留下反馈。",
+                    "Jev answers Yes, No, Irrelevant or Cannot determine yet. Missing details or an ambiguous question can make it hard to decide. It can get things wrong; leave feedback if an answer seems off.",
                   )}
                 </p>
                 {
                   <p className="muted">
                     {t(
-                      "创作题目默认私有。开启分享后，持有链接的人可以游玩和揭底。管理链接相当于密码，请妥善保存。本站不需要账号；清除浏览器 Cookie 会丢失游戏访问权。",
-                      "Created puzzles are private by default. Anyone with a sharing link can play and reveal the answer. Management links act as passwords. No account is required; clearing cookies loses access to saved games.",
+                      "自己写的题目不会出现在题库里。分享链接可以给朋友，他们能游玩和查看答案。管理链接请自己保管，拿到它的人可以修改或删除题目。游戏记录靠浏览器 Cookie 识别，清除后无法找回。",
+                      "Your puzzles stay out of the catalog. Send friends a play link so they can play and reveal the answer. Keep the management link to yourself: it lets anyone edit or delete the puzzle. Clearing browser cookies loses access to your game history.",
                     )}
                   </p>
                 }
@@ -1251,12 +1244,12 @@ export default function App({ locale }: { locale: "zh" | "en" }) {
               <h1>
                 {editing
                   ? t("管理题目", "Manage puzzle")
-                  : t("留一个谜，给别人。", "Leave a mystery for someone.")}
+                  : t("新建题目", "New puzzle")}
               </h1>
               <p className="muted">
                 {t(
-                  "汤面留住悬念，汤底写清事实。题目默认私有，生成链接后可邀请别人游玩，不会进入公共题库。",
-                  "Keep the mystery in the story and the facts in the solution. Save privately, then invite others with a sharing link. Your puzzle stays out of the public catalog.",
+                  "写下题面、答案和必须猜到的关键事实。保存后可以生成分享链接，题目不会出现在公共题库里。",
+                  "Write the story, solution and key facts players need to guess. Save it to create a sharing link. It will not appear in the public catalog.",
                 )}
               </p>
               <form onSubmit={save} className="author-form">
