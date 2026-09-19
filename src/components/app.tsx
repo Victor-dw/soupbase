@@ -7,7 +7,6 @@ type Config = {
   mode: string;
   model: string;
   repository: string | null;
-  version: string;
 };
 type Library = {
   puzzles: PublicPuzzle[];
@@ -1072,8 +1071,6 @@ export default function App({ locale }: { locale: "zh" | "en" }) {
                   <dd>Vercel AI Gateway</dd>
                   <dt>{t("模型", "Model")}</dt>
                   <dd>{cfg?.model || "Jev"}</dd>
-                  <dt>{t("网站版本", "App version")}</dt>
-                  <dd>{cfg?.version}</dd>
                 </dl>
                 <p className="muted small">
                   {t(
@@ -1574,8 +1571,7 @@ export default function App({ locale }: { locale: "zh" | "en" }) {
           >
             Jev by TypeSafe AI ↗
           </a>{" "}
-          × Soupbase{" "}
-          <span className="version">/ v{cfg?.version || "0.1.0"}</span>
+          × Soupbase
         </span>
       </footer>
     </div>

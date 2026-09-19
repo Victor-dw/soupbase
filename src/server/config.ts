@@ -9,6 +9,5 @@ export function config() {
     mode,
     model: "typesafe-ai/jev",
     repository: "https://github.com/spoonnotfound/soupbase",
-    version: "0.1.2",
   };
 }
