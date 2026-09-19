@@ -1,0 +1,47 @@
+{
+  "name": "soupbase",
+  "version": "0.1.2",
+  "private": true,
+  "scripts": {
+    "dev": "node --dns-result-order=ipv4first node_modules/next/dist/bin/next dev --hostname 127.0.0.1",
+    "build": "next build",
+    "start": "node --dns-result-order=ipv4first node_modules/next/dist/bin/next start --hostname 0.0.0.0",
+    "typecheck": "next typegen && tsc --noEmit",
+    "test": "vitest run",
+    "db:migrate": "node --conditions=react-server --import tsx scripts/migrate.ts",
+    "content": "node --conditions=react-server --import tsx scripts/content.ts",
+    "format": "prettier --write src scripts tests *.ts",
+    "content:check": "tsx scripts/check-content.ts",
+    "content:sync": "node --conditions=react-server --import tsx scripts/sync-content.ts",
+    "vercel-build": "node scripts/vercel-build.mjs",
+    "deploy:button": "node scripts/deploy-button.mjs"
+  },
+  "dependencies": {
+    "@ai-sdk/gateway": "4.0.86",
+    "@electric-sql/pglite": "0.5.8",
+    "ai": "7.0.106",
+    "drizzle-orm": "0.45.2",
+    "next": "16.3.5",
+    "pg": "8.23.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "server-only": "0.0.1",
+    "zod": "4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.1",
+    "@types/pg": "8.23.1",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "prettier": "3.9.8",
+    "tsx": "4.23.13",
+    "typescript": "7.0.2",
+    "vitest": "5.0.1"
+  },
+  "type": "module",
+  "description": "A bilingual lateral-thinking puzzle game hosted by Jev.",
+  "license": "MIT",
+  "engines": {
+    "node": ">=24 <25"
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0",
+  "language": "en",
+  "title": "The room with the light on",
+  "surface": "At night, Lin Yuan saw the light on in the room across from his home. Reassured, he put his phone away and went to sleep. He had not contacted anyone, and the room was empty. Why?",
+  "solution": "From home, Lin Yuan was using his phone to remotely control the light in his unoccupied studio, testing whether its smart plug had reconnected. The studio was in the building opposite, visible from his home. Seeing the light turn on confirmed that the remote command had worked. He did not know the other nearby residents and had not asked anyone for help.",
+  "facts": [
+    {
+      "id": "f1",
+      "text": "The room opposite is Lin Yuan’s unoccupied studio.",
+      "required": true
+    },
+    {
+      "id": "f2",
+      "text": "Lin Yuan used his phone to remotely control the studio light and test the smart plug’s connection.",
+      "required": true
+    },
+    {
+      "id": "f3",
+      "text": "Seeing the light turn on confirmed the test had succeeded, so he could go to sleep reassured.",
+      "required": true
+    }
+  ],
+  "unknowns": [
+    "The reason the smart plug had previously disconnected is not specified."
+  ],
+  "character_claims": [],
+  "hints": [
+    "The light was not telling him that someone was home.",
+    "He had performed a test on his phone.",
+    "He could control the light across the way."
+  ],
+  "difficulty": "medium",
+  "tags": [
+    "Everyday",
+    "Technology"
+  ],
+  "source": {
+    "kind": "original",
+    "author": "Soupbase",
+    "note": "English translation of the bundled CC0 example 2, prepared with AI assistance; dedicated under CC0 1.0."
+  },
+  "golden_questions": [
+    {
+      "question": "Was he testing remote control of the light?",
+      "expected": "yes",
+      "reason": "He sent a command from his phone to test the smart plug’s connection."
+    },
+    {
+      "question": "Did another person in the studio switch on the light for him?",
+      "expected": "no",
+      "reason": "The studio was empty; he controlled the light remotely."
+    },
+    {
+      "question": "Was his phone case blue?",
+      "expected": "irrelevant",
+      "reason": "The phone case’s color has no bearing on the explanation."
+    },
+    {
+      "question": "Was he testing the smart plug? Was someone inside the studio? Please answer each separately.",
+      "expected": "uncertain",
+      "reason": "The two questions have different answers: yes and no."
+    }
+  ]
+}

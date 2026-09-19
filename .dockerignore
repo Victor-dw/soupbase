@@ -1,0 +1,13 @@
+node_modules
+.next
+.data
+.git
+.env*
+*.tsbuildinfo
+
+.vercel
+coverage
+*.log
+*.dump
+*.sql.gz
+backups

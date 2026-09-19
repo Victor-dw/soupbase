@@ -1,0 +1,60 @@
+{
+  "schema_version": "1.0",
+  "language": "en",
+  "title": "The blank last page",
+  "surface": "When a girl reached the last page of a book, she smiled. There was not a single word on it, and she had been nervous until then. What happened?",
+  "solution": "The girl was inspecting a collection of her own handwriting practice that she had just bound into a book. She was worried that ink on the reverse of the last sheet had bled through onto the final page. She was checking the finished book page by page, not reading a story. Finding the final page clean, with no ink showing through, made her smile with relief.",
+  "facts": [
+    {
+      "id": "f1",
+      "text": "This is the girl’s own collection of handwriting practice, and she is checking the finished binding.",
+      "required": true
+    },
+    {
+      "id": "f2",
+      "text": "She feared ink had bled through onto the final page; finding it clean showed that it had not.",
+      "required": true
+    }
+  ],
+  "unknowns": [
+    "The girl’s age is not specified."
+  ],
+  "character_claims": [],
+  "hints": [
+    "She was not worried about how a story would end.",
+    "The book was connected to her own work.",
+    "She was checking marks on the paper."
+  ],
+  "difficulty": "hard",
+  "tags": [
+    "Everyday",
+    "Writing"
+  ],
+  "source": {
+    "kind": "original",
+    "author": "Soupbase",
+    "note": "English translation of the bundled CC0 example 3, prepared with AI assistance; dedicated under CC0 1.0."
+  },
+  "golden_questions": [
+    {
+      "question": "Was she checking a book containing her own handwriting practice?",
+      "expected": "yes",
+      "reason": "She was inspecting her newly bound collection."
+    },
+    {
+      "question": "Was she relieved because a fictional character survived?",
+      "expected": "no",
+      "reason": "She was checking ink bleed-through, not following a story."
+    },
+    {
+      "question": "Was she exactly twelve years old?",
+      "expected": "irrelevant",
+      "reason": "Her exact age is unspecified and does not explain the mystery."
+    },
+    {
+      "question": "Was she checking her own work? Had ink bled through onto the last page? Please answer each separately.",
+      "expected": "uncertain",
+      "reason": "The first claim is supported and the second contradicted; separate answers are needed."
+    }
+  ]
+}

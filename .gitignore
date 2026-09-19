@@ -1,0 +1,15 @@
+node_modules/
+.next/
+.env*
+!.env.example
+.data/
+coverage/
+*.tsbuildinfo
+.DS_Store
+
+# Local hosting metadata, debug output and database exports
+.vercel/
+*.log
+*.dump
+*.sql.gz
+backups/
