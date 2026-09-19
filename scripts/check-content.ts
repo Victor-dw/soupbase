@@ -7,5 +7,5 @@ const examples = JSON.parse(
 for (const puzzle of examples) puzzleSchema.parse(puzzle);
 const catalog = await readCatalog();
 console.log(
-  `Validated ${examples.length} bundled examples and ${catalog.length} community puzzles.`,
+  `Validated ${examples.length} bundled examples and ${catalog.length} additional examples.`,
 );

@@ -2,7 +2,8 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { mkdtemp, mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { tmpdir } from "node:os";
-import template from "../content/puzzle.template.json";
+import examples from "../content/examples/index.json";
+const example = examples[0];
 import { readCatalog } from "../scripts/catalog";
 
 let root: string;
@@ -14,17 +15,14 @@ beforeAll(async () => {
   delete process.env.DATABASE_URL;
 });
 
-describe("community catalog", () => {
+describe("example catalog", () => {
   it("validates languages and requires answer examples", async () => {
     const file = path.join(root, "zh", "test-story.json");
-    await writeFile(file, JSON.stringify({ ...template, language: "en" }));
+    await writeFile(file, JSON.stringify({ ...example, language: "en" }));
     await expect(readCatalog(root)).rejects.toThrow("language does not match");
-    await writeFile(
-      file,
-      JSON.stringify({ ...template, golden_questions: [] }),
-    );
+    await writeFile(file, JSON.stringify({ ...example, golden_questions: [] }));
     await expect(readCatalog(root)).rejects.toThrow("at least four");
-    await writeFile(file, JSON.stringify(template));
+    await writeFile(file, JSON.stringify(example));
     expect((await readCatalog(root))[0].id).toBe("community-zh-test-story");
   });
 
@@ -44,7 +42,7 @@ describe("community catalog", () => {
     await query(sql`UPDATE puzzles SET disabled=true WHERE id=${first[0].id}`);
     await writeFile(
       path.join(root, "zh", "test-story.json"),
-      JSON.stringify({ ...template, title: "修改后的标题" }),
+      JSON.stringify({ ...example, title: "修改后的标题" }),
     );
     const next = await readCatalog(root);
     expect(next[0].id).toBe(first[0].id);

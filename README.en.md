@@ -4,7 +4,7 @@ A text-focused, bilingual lateral-thinking puzzle game hosted by Jev. Ask questi
 
 Powered by [Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev) from [TypeSafe AI](https://typesafe.ai/), accessed through Vercel AI Gateway as `typesafe-ai/jev`. Jev evaluates player questions and explanations, returning structured choices, probabilities and confidence that the app uses to display answers and determine outcomes.
 
-[中文](README.md) · [Deployment](docs/deployment.md) · [Puzzle contributions](content/puzzles/README.md) · [Architecture](docs/architecture.md) · [Security](docs/security.md)
+[中文](README.md) · [Deployment](docs/deployment.md) · [Architecture](docs/architecture.md) · [Security](docs/security.md)
 
 ## Deploy to Vercel
 
@@ -46,11 +46,10 @@ There are no accounts, anonymous daily quotas, moderation queues or Star-based u
 
 BYOK requests pass through the deployment server, which can read the key. The application does not persist or intentionally log it; open source does not prove a remote deployment runs identical code. See [security boundaries](docs/security.md).
 
-## Content and contributions
+## Example puzzles
 
-The release includes three original Chinese examples and their English versions. Base examples are in `content/examples/index.json`; additional translations and community contributions are individual JSON files in `content/puzzles/`.
+The release includes three original Chinese examples and their English versions. Base examples are in `content/examples/index.json`; additional English examples are individual JSON files in `content/puzzles/`.
 
-Copy the [template](content/puzzle.template.json), follow the [bilingual guide](content/puzzles/README.md), and submit a PR with permission details. A maintainer reviews it; deployment content sync is explicit. Public solutions are visible in the repository. Keep private puzzles, management links and database backups out of Git.
 
 ## Development
 
@@ -61,8 +60,8 @@ npm test
 npm run build
 ```
 
-Tests use isolated databases and a mock model, without API credentials or paid calls. They do not establish model accuracy. The stack is Next.js, React, TypeScript, PostgreSQL/PGlite and Vercel AI SDK. See [CONTRIBUTING.md](CONTRIBUTING.md).
+Tests use isolated databases and a mock model, without API credentials or paid calls. They do not establish model accuracy. The stack is Next.js, React, TypeScript, PostgreSQL/PGlite and Vercel AI SDK.
 
 ## License
 
-[MIT](LICENSE) for code; [CC0 1.0](content/LICENSE.md) for bundled original puzzles. User submissions and third-party material are not automatically relicensed. Adaptations require documented permission, not merely a source URL.
+[MIT](LICENSE) for code; [CC0 1.0](content/LICENSE.md) for bundled original puzzles. This content license does not apply to privately authored user puzzles.

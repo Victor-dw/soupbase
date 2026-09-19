@@ -4,7 +4,7 @@
 
 模型使用 [TypeSafe AI](https://typesafe.ai/) 的 [Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev)，通过 Vercel AI Gateway（`typesafe-ai/jev`）调用。Jev 负责提问判定与还原评分，返回结构化选项、概率和置信度；网站据此展示回答和判定结果。
 
-[English](README.en.md) · [部署](docs/deployment.md) · [贡献题目](content/puzzles/README.md) · [模型与架构](docs/architecture.md) · [安全边界](docs/security.md)
+[English](README.en.md) · [部署](docs/deployment.md) · [模型与架构](docs/architecture.md) · [安全边界](docs/security.md)
 
 ## 部署到 Vercel
 
@@ -55,16 +55,15 @@ Vercel 部署通过 Neon 集成创建 PostgreSQL 并自动注入连接串；域�
 
 BYOK 请求会经过部署者服务器，服务器能读取 Key；开源并不意味着浏览器直连供应商。本应用代码不持久化或主动记录模型 Key。更完整的信任边界见[安全说明](docs/security.md)。站点 Key 模式没有内置消费限额，额度管理由部署者负责。
 
-## 题目与贡献
+## 示例题目
 
-公开发行内容包括三道中文原创示例和对应英文版本。基础示例位于 `content/examples/index.json`，补充翻译及后续贡献放在 `content/puzzles/`，一题一个 JSON。题目格式由 `src/shared/puzzle.ts` 定义。
+公开发行内容包括三道中文原创示例和对应英文版本。基础示例位于 `content/examples/index.json`，补充英文示例位于 `content/puzzles/`，一题一个 JSON。题目格式由 `src/shared/puzzle.ts` 定义。
 
 ```sh
 npm run content:check
 npm run content:sync
 ```
 
-贡献题目请复制 [JSON 模板](content/puzzle.template.json)，参考[题目指南](content/puzzles/README.md)，通过 GitHub PR 提交。维护者检查来源、许可和逻辑后合并；部署者同步后才会更新数据库。网页分享不等于公共投稿。
 
 管理链接相当于密码；分享链接只授予游玩权限。不要把管理链接、私有题目或数据库备份提交到 Git。公开题目的汤底也随仓库公开，系统不用于防作弊。
 
@@ -79,8 +78,8 @@ npm run build
 
 测试使用隔离数据库和模拟模型，不需要真实 Key，也不消耗模型额度。覆盖访问控制、分享撤销、版本固定、凭证隔离、并发及判题结果处理。测试通过不等于模型答案永远正确。
 
-技术栈：Next.js App Router、React、TypeScript、PostgreSQL / PGlite、Vercel AI SDK。运行与维护脚本见[贡献指南](CONTRIBUTING.md)。
+技术栈：Next.js App Router、React、TypeScript、PostgreSQL / PGlite、Vercel AI SDK。
 
 ## 许可
 
-代码采用 [MIT](LICENSE)。内置原创题目采用 [CC0 1.0](content/LICENSE.md)；用户提交内容不自动继承代码许可。第三方改编题需另行提供明确许可，不能仅凭来源链接加入公开题库。
+代码采用 [MIT](LICENSE)。内置原创题目采用 [CC0 1.0](content/LICENSE.md)；用户私有创作的题目不适用此许可。
