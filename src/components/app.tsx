@@ -26,7 +26,6 @@ const blank: PuzzleInput = {
   difficulty: "medium",
   tags: [],
   source: { kind: "original", author: "Anonymous" },
-  golden_questions: [],
 };
 const answers: Record<string, [string, string]> = {
   yes: ["是", "Yes"],

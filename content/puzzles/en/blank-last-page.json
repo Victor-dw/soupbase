@@ -35,27 +35,5 @@
     "kind": "original",
     "author": "Soupbase",
     "note": "English translation of the bundled CC0 example 3, prepared with AI assistance; dedicated under CC0 1.0."
-  },
-  "golden_questions": [
-    {
-      "question": "Was she checking a book containing her own handwriting practice?",
-      "expected": "yes",
-      "reason": "She was inspecting her newly bound collection."
-    },
-    {
-      "question": "Was she relieved because a fictional character survived?",
-      "expected": "no",
-      "reason": "She was checking ink bleed-through, not following a story."
-    },
-    {
-      "question": "Was she exactly twelve years old?",
-      "expected": "irrelevant",
-      "reason": "Her exact age is unspecified and does not explain the mystery."
-    },
-    {
-      "question": "Was she checking her own work? Had ink bled through onto the last page? Please answer each separately.",
-      "expected": "uncertain",
-      "reason": "The first claim is supported and the second contradicted; separate answers are needed."
-    }
-  ]
+  }
 }

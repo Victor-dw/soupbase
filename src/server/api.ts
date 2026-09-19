@@ -151,11 +151,15 @@ export async function handle(req: NextRequest, paths: string[]) {
       const manage = mutation || action === "export";
       const p = await puzzle(id, v?.id, manage);
       if (method === "GET" && !action) return reply(publicPuzzle(p));
-      if (method === "GET" && action === "export")
+      if (method === "GET" && action === "export") {
+        // Older database revisions can still contain the removed question fixtures.
+        const { golden_questions: _legacyQuestions, ...content } =
+          p.secret_content;
         return reply({
-          content: puzzleSchema.parse(p.secret_content),
+          content: puzzleSchema.parse(content),
           revision: p.revision,
         });
+      }
       if (!v) throw new AppError("not_found", 404);
       if (method === "PATCH" && !action) {
         const b = z

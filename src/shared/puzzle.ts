@@ -8,7 +8,7 @@ const text = (max: number) =>
     .refine((s) => [...s].length <= max, "Text is too long");
 export const decisions = ["yes", "no", "irrelevant", "uncertain"] as const;
 export type Decision = (typeof decisions)[number];
-// Old games and imported question fixtures keep working with the simpler host.
+// Old games keep working with the simpler host.
 export function normalizeHostDecision(value: string): Decision {
   return decisions.includes(value as Decision)
     ? (value as Decision)
@@ -48,27 +48,6 @@ export const puzzleSchema = z
         .optional(),
       note: z.string().max(2000).optional(),
     }),
-    golden_questions: z
-      .array(
-        z.strictObject({
-          question: text(500),
-          expected: z
-            .enum([
-              "yes",
-              "no",
-              "unknown",
-              "irrelevant",
-              "ambiguous",
-              "split",
-              "invalid",
-              "uncertain",
-            ])
-            .transform(normalizeHostDecision),
-          reason: text(1000),
-        }),
-      )
-      .max(50)
-      .default([]),
   })
   .superRefine((p, c) => {
     if (new Set(p.facts.map((f) => f.id)).size !== p.facts.length)

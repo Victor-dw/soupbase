@@ -16,12 +16,3 @@ export async function syncCatalog(
     );
   }
 }
-
-/** Retire public catalog entries without revoking existing games or links. */
-export async function archiveCatalog(ids: string[]) {
-  for (const id of ids) {
-    await query(
-      sql`UPDATE puzzles SET visibility='archived' WHERE id=${id} AND owner_id IS NULL AND visibility='curated'`,
-    );
-  }
-}

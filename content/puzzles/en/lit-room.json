@@ -40,27 +40,5 @@
     "kind": "original",
     "author": "Soupbase",
     "note": "English translation of the bundled CC0 example 2, prepared with AI assistance; dedicated under CC0 1.0."
-  },
-  "golden_questions": [
-    {
-      "question": "Was he testing remote control of the light?",
-      "expected": "yes",
-      "reason": "He sent a command from his phone to test the smart plug’s connection."
-    },
-    {
-      "question": "Did another person in the studio switch on the light for him?",
-      "expected": "no",
-      "reason": "The studio was empty; he controlled the light remotely."
-    },
-    {
-      "question": "Was his phone case blue?",
-      "expected": "irrelevant",
-      "reason": "The phone case’s color has no bearing on the explanation."
-    },
-    {
-      "question": "Was he testing the smart plug? Was someone inside the studio? Please answer each separately.",
-      "expected": "uncertain",
-      "reason": "The two questions have different answers: yes and no."
-    }
-  ]
+  }
 }

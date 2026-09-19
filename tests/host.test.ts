@@ -13,12 +13,8 @@ describe("four-answer host", () => {
     const p = puzzleSchema.parse({
       ...puzzleContent,
       irrelevant_topics: ["门铃是否发声"],
-      golden_questions: [
-        { question: "旧问题", expected: "unknown", reason: "旧格式" },
-      ],
     });
     expect(p).not.toHaveProperty("irrelevant_topics");
-    expect(p.golden_questions[0].expected).toBe("uncertain");
     const state = hostState(
       { ...p, irrelevant_topics: ["门铃是否发声"] } as typeof p,
       "门铃响了吗？",
