@@ -500,8 +500,7 @@ export default function App({ locale }: { locale: "zh" | "en" }) {
                       onClick={() => void run(() => openPuzzle(p))}
                     >
                       <span className="eyebrow">
-                        {String(i + 1).padStart(2, "0")} /{" "}
-                        {p.tags[0] || t("故事", "STORY")}
+                        {String(i + 1).padStart(2, "0")}
                       </span>
                       <strong>{p.title}</strong>
                       <span>{difficulty(p.difficulty)}</span>
@@ -744,56 +743,65 @@ export default function App({ locale }: { locale: "zh" | "en" }) {
                       onSubmit={submit}
                     >
                       <div className="composer-toolbar">
-                        {
+                        <div
+                          className="composer-modes"
+                          role="group"
+                          aria-label={t("输入模式", "Input mode")}
+                        >
+                          {[false, true].map((mode) => (
+                            <button
+                              key={String(mode)}
+                              type="button"
+                              disabled={busy}
+                              aria-pressed={guess === mode}
+                              onClick={() => {
+                                setGuess(mode);
+                                setConfirmReveal(false);
+                                requestAnimationFrame(() =>
+                                  questionInput.current?.focus({
+                                    preventScroll: true,
+                                  }),
+                                );
+                              }}
+                            >
+                              {mode ? t("还原", "Explain") : t("提问", "Ask")}
+                            </button>
+                          ))}
+                        </div>
+                        <div className="composer-actions">
+                          <button
+                            type="button"
+                            disabled={
+                              busy ||
+                              !selected.hintTotal ||
+                              (game?.hints.length || 0) >= selected.hintTotal
+                            }
+                            onClick={() =>
+                              void run(async () => {
+                                const g = game || (await start());
+                                if (g)
+                                  setGame(
+                                    await api<Game>(
+                                      `sessions/${g.id}/hints`,
+                                      "POST",
+                                      { clientRequestId: crypto.randomUUID() },
+                                    ),
+                                  );
+                              })
+                            }
+                          >
+                            {t("看提示", "Get hint")} {game?.hints.length || 0}/
+                            {selected.hintTotal}
+                          </button>
                           <button
                             type="button"
                             disabled={busy}
-                            className="composer-mode"
-                            title={
-                              guess
-                                ? t("切换到提问", "Switch to questions")
-                                : t("切换到还原", "Switch to explanation")
-                            }
-                            aria-pressed={guess}
-                            onClick={() => {
-                              setGuess(!guess);
-                              setConfirmReveal(false);
-                              requestAnimationFrame(() =>
-                                questionInput.current?.focus({
-                                  preventScroll: true,
-                                }),
-                              );
-                            }}
+                            aria-expanded={confirmReveal}
+                            onClick={() => setConfirmReveal(!confirmReveal)}
                           >
-                            {guess
-                              ? t("还原模式 ⇄", "Explain ⇄")
-                              : t("提问模式 ⇄", "Ask ⇄")}
+                            {t("看答案", "View answer")}
                           </button>
-                        }
-                        <button
-                          type="button"
-                          disabled={
-                            busy ||
-                            !selected.hintTotal ||
-                            (game?.hints.length || 0) >= selected.hintTotal
-                          }
-                          onClick={() =>
-                            void run(async () => {
-                              const g = game || (await start());
-                              if (g)
-                                setGame(
-                                  await api<Game>(
-                                    `sessions/${g.id}/hints`,
-                                    "POST",
-                                    { clientRequestId: crypto.randomUUID() },
-                                  ),
-                                );
-                            })
-                          }
-                        >
-                          {t("提示", "Hint")} {game?.hints.length || 0}/
-                          {selected.hintTotal}
-                        </button>
+                        </div>
                       </div>
                       {guess && (
                         <p id="guess-help" className="guess-help">
@@ -864,16 +872,6 @@ export default function App({ locale }: { locale: "zh" | "en" }) {
                             : t("提问", "Ask")}
                       </button>
                     </form>
-                    <div className="game-tools">
-                      <div>
-                        <button
-                          disabled={busy}
-                          onClick={() => setConfirmReveal(!confirmReveal)}
-                        >
-                          {t("揭晓答案", "Reveal answer")}
-                        </button>
-                      </div>
-                    </div>
                     {confirmReveal && (
                       <div className="confirmation">
                         <p>
@@ -906,7 +904,7 @@ export default function App({ locale }: { locale: "zh" | "en" }) {
                             })
                           }
                         >
-                          {t("确认揭晓", "Confirm reveal")}
+                          {t("确认看答案", "View answer")}
                         </button>
                       </div>
                     )}
@@ -1132,18 +1130,10 @@ export default function App({ locale }: { locale: "zh" | "en" }) {
                 <h2>{t("关于回答", "About the answers")}</h2>
                 <p>
                   {t(
-                    "Jev 会回答「是」「不是」「不重要」或「暂时无法判断」。题目没交代清楚，或问题有歧义时，它可能无法判断。回答不一定都对；觉得不对可以留下反馈。",
-                    "Jev answers Yes, No, Irrelevant or Cannot determine yet. Missing details or an ambiguous question can make it hard to decide. It can get things wrong; leave feedback if an answer seems off.",
+                    "Jev 会回答「是」「不是」「不重要」或「暂时无法判断」。题目没交代清楚，或问题有歧义时，它可能无法判断。",
+                    "Jev answers Yes, No, Irrelevant or Cannot determine yet. Missing details or an ambiguous question can make it hard to decide.",
                   )}
                 </p>
-                {
-                  <p className="muted">
-                    {t(
-                      "自己写的题目不会出现在题库里。分享链接可以给朋友，他们能游玩和查看答案。管理链接请自己保管，拿到它的人可以修改或删除题目。游戏记录靠浏览器 Cookie 识别，清除后无法找回。",
-                      "Your puzzles stay out of the catalog. Send friends a play link so they can play and reveal the answer. Keep the management link to yourself: it lets anyone edit or delete the puzzle. Clearing browser cookies loses access to your game history.",
-                    )}
-                  </p>
-                }
                 {cfg?.repository ? (
                   <a
                     className="text-link"
