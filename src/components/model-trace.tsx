@@ -9,6 +9,20 @@ type TraceTurn = {
   prompt_version: string | null;
   trace: { request: unknown; response: unknown } | null;
 };
+function promptLabel(version: string | null, en: boolean) {
+  if (!version) return en ? "Prompt version unavailable" : "未记录提示词版本";
+  const match = /^(host|guess)-v?(\d+\.\d+)(?:-.+)?$/.exec(version);
+  if (!match) return version;
+  const name =
+    match[1] === "host"
+      ? en
+        ? "Question prompt"
+        : "提问提示词"
+      : en
+        ? "Explanation prompt"
+        : "还原提示词";
+  return `${name} v${match[2]}`;
+}
 export function ModelTrace({
   sessionId,
   en,
@@ -67,7 +81,7 @@ export function ModelTrace({
             {i + 1}. {turn.input}
           </summary>
           <p className="muted small">
-            {turn.model} · {turn.prompt_version} ·{" "}
+            {turn.model} · {promptLabel(turn.prompt_version, en)} ·{" "}
             {turn.decision || turn.status}
           </p>
           {turn.trace ? (

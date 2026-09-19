@@ -4,7 +4,7 @@ import { CONFIDENCE_THRESHOLD } from "@/shared/confidence";
 
 export type GuessDecision = "solved" | "incomplete" | "uncertain";
 
-export const GUESS_PROMPT_VERSION = "guess-1.2-context";
+export const GUESS_PROMPT_VERSION = "guess-v1.2";
 
 export function guessQuestions(puzzle: PuzzleInput) {
   const questions: Record<
