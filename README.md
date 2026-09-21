@@ -1,8 +1,8 @@
 # 汤底 · Soupbase
 
-一个以文字为中心的中英文海龟汤网站，由 Jev 担任主持人。支持提问、逐步提示、提交还原，以及私有创作和链接分享。
+一个中英文海龟汤网站：Jev 坐堂判题，DeepSeek 现煮无限题库。界面是迷雾侦探社——汤面档案、审讯室、调查罗盘、生存连关。
 
-模型使用 [TypeSafe AI](https://typesafe.ai/) 的 [Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev)，通过 Vercel AI Gateway（`typesafe-ai/jev`）调用。Jev 负责提问判定与还原评分，返回结构化选项、概率和置信度；网站据此展示回答和判定结果。
+[Jev](https://typesafe.ai/) 走 TypeSafe 官网 API，负责提问判定与还原评分。DeepSeek 走兼容 OpenAI 的网关，只负责煮题和调查罗盘，看不到正在玩的汤底。玩家界面不展示 confidence。
 
 [English](README.en.md) · [部署](docs/deployment.md) · [模型与架构](docs/architecture.md) · [安全边界](docs/security.md)
 
@@ -20,11 +20,11 @@
 
 ## 功能
 
-- 四种主持回答：是、不是、不重要、暂时无法判断；展示模型原生 confidence。
-- 中文 / 英文界面、深浅主题、游戏记录、主动揭晓。
+- 四种主持回答：是、不是、不重要、暂时无法判断。由 Jev 判定，界面不显示把握数字。
+- 无限探案：过一题立刻现煮下一题；揭底结束本趟。生成题默认不进题库，可收藏。
+- 调查罗盘由 DeepSeek 根据汤面和已问问题出是非问句。
 - 网页创作；题目默认私有，分享链接可撤销，不进入公共题库。
-- 支持 BYOK、站点提供 Key，或两者并存。
-- 无账号系统；不包含匿名每日配额、内容审核或 Star 解锁。
+- 无账号系统。
 
 ## 本地运行
 

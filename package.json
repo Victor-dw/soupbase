@@ -1,6 +1,6 @@
 {
   "name": "soupbase",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
     "dev": "node --dns-result-order=ipv4first node_modules/next/dist/bin/next dev --hostname 127.0.0.1",
@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@ai-sdk/gateway": "4.0.86",
+    "@ai-sdk/typesafe-ai": "3.0.4",
     "@electric-sql/pglite": "0.5.8",
     "ai": "7.0.106",
     "drizzle-orm": "0.45.2",
@@ -39,7 +40,7 @@
     "vitest": "5.0.1"
   },
   "type": "module",
-  "description": "A bilingual lateral-thinking puzzle game hosted by Jev.",
+  "description": "Lateral-thinking puzzles hosted by Jev, with DeepSeek-generated endless cases.",
   "license": "MIT",
   "engines": {
     "node": ">=24 <25"

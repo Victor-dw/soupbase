@@ -8,7 +8,7 @@ if (!/^[\w.-]+\/[\w.-]+$/.test(slug)) {
 const repo = `https://github.com/${slug}`;
 function button(site) {
   const env = ["AI_ACCESS_MODE"];
-  if (site) env.push("AI_GATEWAY_API_KEY");
+  if (site) env.push("TYPESAFE_API_KEY", "DEEPSEEK_API_KEY", "DEEPSEEK_BASE_URL");
   const url = new URL("https://vercel.com/new/clone");
   url.searchParams.set("repository-url", repo);
   url.searchParams.set("env", env.join(","));
@@ -30,7 +30,7 @@ function button(site) {
   );
   url.searchParams.set(
     "envDescription",
-    "Connect Neon Postgres in the deployment flow. Choose AI_ACCESS_MODE; site mode also requires your own Vercel AI Gateway key.",
+    "Connect Neon Postgres in the deployment flow. Site mode needs a TypeSafe Jev key and a DeepSeek-compatible key.",
   );
   url.searchParams.set("envLink", `${repo}/blob/HEAD/docs/deployment.md`);
   return `[![Deploy with Vercel](https://vercel.com/button)](${url})`;

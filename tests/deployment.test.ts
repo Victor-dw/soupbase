@@ -42,10 +42,8 @@ describe("Vercel deployment", () => {
       expect(urls[0].searchParams.get("repository-url")).toBe(
         "https://github.com/example/soup",
       );
-      expect(urls[0].searchParams.get("env")).toContain("AI_GATEWAY_API_KEY");
-      expect(urls[1].searchParams.get("env")).not.toContain(
-        "AI_GATEWAY_API_KEY",
-      );
+      expect(urls[0].searchParams.get("env")).toContain("TYPESAFE_API_KEY");
+      expect(urls[1].searchParams.get("env")).not.toContain("TYPESAFE_API_KEY");
       expect(JSON.parse(urls[0].searchParams.get("envDefaults")!)).toEqual({
         AI_ACCESS_MODE: "both",
       });
@@ -61,7 +59,7 @@ describe("Vercel deployment", () => {
     [{}, "DATABASE_URL"],
     [
       { DATABASE_URL: "postgres://synthetic", AI_ACCESS_MODE: "both" },
-      "AI_GATEWAY_API_KEY",
+      "TYPESAFE_API_KEY",
     ],
     [
       { DATABASE_URL: "postgres://synthetic", AI_ACCESS_MODE: "invalid" },

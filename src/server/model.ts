@@ -1,17 +1,20 @@
 import "server-only";
 import { experimental_evaluate as evaluate } from "ai";
-import { createGateway } from "@ai-sdk/gateway";
+import { createTypeSafeAi } from "@ai-sdk/typesafe-ai";
 import { AppError } from "./access";
-import { config } from "./config";
+import { config, typesafeBase, typesafeKey } from "./config";
 import { guessQuestions, gradeGuess } from "./guess";
 import { hostQuestions, hostState } from "./host";
+import { hostOf, lockedFetch } from "./outbound";
 import { CONFIDENCE_THRESHOLD } from "@/shared/confidence";
 import { decisions, type Decision, type PuzzleInput } from "@/shared/puzzle";
 export function selectKey(source: string, byok: string | null) {
   const c = config();
   if (source === "site") {
     if (c.mode === "byok_only") throw new AppError("site_disabled", 403);
-    return process.env.AI_GATEWAY_API_KEY!;
+    const key = typesafeKey();
+    if (!key) throw new AppError("key_required", 401);
+    return key;
   }
   if (source === "byok") {
     if (c.mode === "site_only") throw new AppError("byok_disabled", 403);
@@ -34,14 +37,11 @@ export async function judge(
   kind: string,
   key: string,
 ) {
-  const gateway = createGateway({
+  const baseURL = typesafeBase();
+  const typesafe = createTypeSafeAi({
     apiKey: key,
-    fetch: async (url, init) => {
-      const host = new URL(String(url)).hostname;
-      if (host !== "ai-gateway.vercel.sh")
-        throw new AppError("upstream_failed", 502);
-      return fetch(url, { ...init, redirect: "error" });
-    },
+    baseURL,
+    fetch: lockedFetch(hostOf(baseURL)),
   });
   const questions: Record<
     string,
@@ -50,7 +50,7 @@ export async function judge(
   const state = hostState(p, input, kind === "guess" ? [] : history);
   try {
     const r = await evaluate({
-      model: gateway.evaluationModel(config().model),
+      model: typesafe.evaluationModel(config().model),
       state,
       questions,
       maxRetries: 0,

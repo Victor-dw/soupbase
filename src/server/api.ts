@@ -15,7 +15,16 @@ import {
   publicPuzzle,
 } from "./access";
 import { config } from "./config";
+import { generateCompass } from "./deepseek";
 import { judge, selectKey } from "./model";
+import {
+  advanceRun,
+  collectRunPuzzle,
+  currentRun,
+  endRun,
+  endRunForSession,
+  startRun,
+} from "./runs";
 async function readBody(req: NextRequest) {
   if (Number(req.headers.get("content-length") || 0) > 65536)
     throw new AppError("too_large", 413);
@@ -43,7 +52,7 @@ const idSchema = z.string().min(1).max(100);
 const requestSchema = z.object({
   text: z.string().trim().min(1),
   clientRequestId: z.string().uuid(),
-  credentialSource: z.enum(["site", "byok"]),
+  credentialSource: z.enum(["site", "byok"]).default("site"),
 });
 export async function handle(req: NextRequest, paths: string[]) {
   let newToken: string | undefined;
@@ -98,7 +107,7 @@ export async function handle(req: NextRequest, paths: string[]) {
     if (area === "library" && !id && method === "GET") {
       if (!v) return reply({ puzzles: [] });
       const puzzles = await query(
-        sql`SELECT DISTINCT p.id,p.revision,p.visibility,r.public_content FROM puzzles p JOIN revisions r ON r.id=p.revision LEFT JOIN grants g ON g.puzzle_id=p.id AND g.visitor_id=${v.id} AND g.role='manage' AND g.version=p.manage_version WHERE NOT p.disabled AND (p.owner_id=${v.id} OR g.visitor_id IS NOT NULL)`,
+        sql`SELECT DISTINCT p.id,p.revision,p.visibility,r.public_content FROM puzzles p JOIN revisions r ON r.id=p.revision LEFT JOIN grants g ON g.puzzle_id=p.id AND g.visitor_id=${v.id} AND g.role='manage' AND g.version=p.manage_version WHERE NOT p.disabled AND p.visibility<>'run' AND (p.owner_id=${v.id} OR g.visitor_id IS NOT NULL)`,
       );
       return reply({ puzzles: puzzles.map(publicPuzzle) });
     }
@@ -199,6 +208,31 @@ export async function handle(req: NextRequest, paths: string[]) {
         return reply({ manageKey: token });
       }
     }
+    if (area === "runs") {
+      if (!id && method === "GET")
+        return reply({ run: v ? await currentRun(v.id) : null });
+      if (!v) throw new AppError("not_found", 404);
+      if (!id && method === "POST") {
+        const b = z
+          .strictObject({ locale: z.enum(["zh", "en"]).default("zh") })
+          .parse(body);
+        const started = await startRun(v.id, b.locale);
+        return reply(started, 201);
+      }
+      if (!id) throw new AppError("not_found", 404);
+      idSchema.parse(id);
+      if (action === "advance" && method === "POST")
+        return reply(await advanceRun(id, v.id));
+      if (action === "collect" && method === "POST")
+        return reply(await collectRunPuzzle(id, v.id));
+      if (action === "end" && method === "POST") {
+        const b = z
+          .strictObject({ reason: z.enum(["revealed", "abandoned"]).default("abandoned") })
+          .parse(body);
+        return reply({ run: await endRun(id, v.id, b.reason) });
+      }
+      throw new AppError("not_found", 404);
+    }
     if (area === "sessions") {
       if (!v) throw new AppError("not_found", 404);
       if (!id && method === "POST") {
@@ -227,7 +261,30 @@ export async function handle(req: NextRequest, paths: string[]) {
         await query(
           sql`UPDATE turns SET status='cancelled' WHERE session_id=${id} AND status='pending'`,
         );
+        await endRunForSession(id, v.id, "revealed");
         return reply(await game(id, v.id));
+      }
+      if (action === "compass" && method === "POST") {
+        const history = await query<{ input: string; decision: string }>(
+          sql`SELECT input,decision FROM turns WHERE session_id=${id} AND status='complete' AND kind='question' ORDER BY created_at DESC LIMIT 8`,
+        );
+        const locale = s.public_content.language === "en" ? "en" : "zh";
+        const extras = (s.extras && typeof s.extras === "object" ? s.extras : {}) as {
+          compass?: unknown;
+          compassTurns?: number;
+        };
+        const turnCount = history.length;
+        if (extras.compass && extras.compassTurns === turnCount)
+          return reply({ compass: extras.compass });
+        const compass = await generateCompass({
+          language: locale,
+          surface: s.public_content.surface,
+          history: history.reverse(),
+        });
+        await query(
+          sql`UPDATE sessions SET extras=${JSON.stringify({ ...extras, compass, compassTurns: turnCount })}::jsonb WHERE id=${id}`,
+        );
+        return reply({ compass });
       }
       if (s.status !== "active") throw new AppError("game_finished", 409);
       if (action === "hints" && method === "POST") {
@@ -289,6 +346,10 @@ export async function handle(req: NextRequest, paths: string[]) {
           if (!finalized.length)
             await query(
               sql`UPDATE turns SET status='cancelled' WHERE id=${tid}`,
+            );
+          if (result.decision === "solved")
+            await query(
+              sql`UPDATE runs SET streak=streak+1,updated_at=now() WHERE current_session_id=${id} AND status='active'`,
             );
           return reply(await game(id, v.id));
         } catch (e) {

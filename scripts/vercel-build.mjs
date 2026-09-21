@@ -12,9 +12,16 @@ if (process.env.VERCEL === "1") {
   const mode = process.env.AI_ACCESS_MODE || "byok_only";
   if (!["byok_only", "site_only", "both"].includes(mode))
     fail("Invalid AI_ACCESS_MODE.");
-  if (mode !== "byok_only" && !process.env.AI_GATEWAY_API_KEY)
+  if (
+    mode !== "byok_only" &&
+    !(
+      process.env.TYPESAFE_API_KEY ||
+      process.env.TYPESAFE_AI_API_KEY ||
+      process.env.AI_GATEWAY_API_KEY
+    )
+  )
     fail(
-      "Site access requires AI_GATEWAY_API_KEY in Vercel Environment Variables.",
+      "Site access requires TYPESAFE_API_KEY in Vercel Environment Variables.",
     );
 }
 if (setup && !process.env.DATABASE_URL)

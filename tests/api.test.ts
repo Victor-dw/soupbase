@@ -14,8 +14,8 @@ const mocked = vi.hoisted(() => ({
   hostState: undefined as unknown,
   hostOptions: [] as string[],
 }));
-vi.mock("@ai-sdk/gateway", () => ({
-  createGateway: ({ apiKey }: { apiKey: string }) => ({
+vi.mock("@ai-sdk/typesafe-ai", () => ({
+  createTypeSafeAi: ({ apiKey }: { apiKey: string }) => ({
     evaluationModel: () => ({ key: apiKey }),
   }),
 }));
