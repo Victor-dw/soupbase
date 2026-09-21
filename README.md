@@ -2,7 +2,7 @@
 
 一个中英文海龟汤网站：Jev 坐堂判题，DeepSeek 现煮无限题库。界面是迷雾侦探社——汤面档案、审讯室、调查罗盘、生存连关。
 
-[Jev](https://typesafe.ai/) 走 TypeSafe 官网 API，负责提问判定与还原评分。DeepSeek 走兼容 OpenAI 的网关，只负责煮题和调查罗盘，看不到正在玩的汤底。玩家界面不展示 confidence。
+[Jev](https://typesafe.ai/) 走 TypeSafe 官网 API，负责提问判定与还原评分。煮题和调查罗盘走 xictory 兼容网关（默认 `gemini-3.1-flash-lite`），看不到正在玩的汤底。玩家界面不展示 confidence。
 
 [English](README.en.md) · [部署](docs/deployment.md) · [模型与架构](docs/architecture.md) · [安全边界](docs/security.md)
 

@@ -32,7 +32,7 @@ export function config() {
   return {
     mode,
     model: process.env.JEV_MODEL || "jev-latest",
-    deepseekModel: process.env.DEEPSEEK_MODEL || "deepseek-v4.1-flash",
+    deepseekModel: process.env.DEEPSEEK_MODEL || "gemini-3.1-flash-lite",
     hasDeepSeek: Boolean(process.env.DEEPSEEK_API_KEY),
     repository: "https://github.com/spoonnotfound/soupbase",
   };

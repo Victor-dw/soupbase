@@ -30,7 +30,7 @@ const compassSchema = z.object({
   cause: z.array(z.string().trim().min(1).max(80)).min(2).max(4),
 });
 
-async function chatJson(prompt: string) {
+async function chatJson(prompt: string, maxTokens = 1200) {
   const key = process.env.DEEPSEEK_API_KEY;
   if (!key) throw new AppError("deepseek_unavailable", 503);
   const base = deepseekBase();
@@ -44,6 +44,7 @@ async function chatJson(prompt: string) {
     body: JSON.stringify({
       model,
       temperature: 0.8,
+      max_tokens: maxTokens,
       response_format: { type: "json_object" },
       messages: [
         {
@@ -53,7 +54,7 @@ async function chatJson(prompt: string) {
         { role: "user", content: prompt },
       ],
     }),
-    signal: AbortSignal.timeout(45000),
+    signal: AbortSignal.timeout(20000),
   });
   if (res.status === 401 || res.status === 403)
     throw new AppError("key_rejected", 401);
@@ -119,7 +120,7 @@ JSON keys: title, surface, solution, facts[{text, required}], hints (max 3), tag
   let last: unknown;
   for (let i = 0; i < 2; i++) {
     try {
-      const raw = draftSchema.parse(await chatJson(prompt));
+      const raw = draftSchema.parse(await chatJson(prompt, 1400));
       if (!raw.facts.some((f) => f.required)) raw.facts[0].required = true;
       return toPuzzle(raw, input.language, input.difficulty);
     } catch (e) {
@@ -153,5 +154,5 @@ Never imply the solution. Write a fresh batch, do not repeat: ${avoid || "none"}
 Surface: ${input.surface}
 Asked: ${asked || "none"}
 JSON: {"identity":["..."],"scene":["..."],"cause":["..."]}, 2-4 each.`;
-  return compassSchema.parse(await chatJson(prompt));
+  return compassSchema.parse(await chatJson(prompt, 500));
 }
