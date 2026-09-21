@@ -88,6 +88,7 @@ export default function App({ locale }: { locale: string }) {
     null | "library" | "guess" | "truth" | "rules" | "create"
   >(null);
   const [loading, setLoading] = useState(false);
+  const [cookLoading, setCookLoading] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [view, setView] = useState<View>("play");
@@ -202,6 +203,34 @@ export default function App({ locale }: { locale: string }) {
       setNotice(t("无限探案已开启。", "Endless case opened.", en));
     });
   }
+  async function swapCase() {
+    if (cookLoading) return;
+    setCookLoading(true);
+    setError("");
+    try {
+      const r = run?.status === "active"
+        ? await api<{ run: RunState; game: Game }>(
+            `runs/${run.id}/reroll`,
+            "POST",
+            {},
+          )
+        : await api<{ run: RunState; game: Game }>("runs", "POST", { locale });
+      setRun(r.run);
+      setGame(r.game);
+      setSelected(r.game.puzzle);
+      setCompass(null);
+      setQuestion("");
+      setGuess("");
+      setModal(null);
+      setNotice(
+        t(`新题：${r.game.puzzle.title}`, `New case: ${r.game.puzzle.title}`, en),
+      );
+    } catch (e) {
+      explain(e);
+    } finally {
+      setCookLoading(false);
+    }
+  }
   async function advance() {
     if (!run) return;
     await runTask(async () => {
@@ -305,8 +334,8 @@ export default function App({ locale }: { locale: string }) {
       setCompass(r.compass);
       setNotice(
         t(
-          "罗盘已更新：点下面的问句就会交给 Jev。",
-          "Compass ready. Click a question to ask Jev.",
+          "问句已更新，题目没换。点问句交给 Jev；要换汤请点「换一案」。",
+          "New questions, same case. Click a chip to ask Jev, or “New case” to cook another puzzle.",
           en,
         ),
       );
@@ -383,6 +412,15 @@ export default function App({ locale }: { locale: string }) {
             {run?.status === "active" ? (
               <span className="streak"> · {run.streak}</span>
             ) : null}
+          </button>
+          <button
+            className="ghost"
+            onClick={swapCase}
+            disabled={cookLoading || !cfg?.hasDeepSeek}
+          >
+            {cookLoading
+              ? t("正在煲汤…", "Cooking…", en)
+              : t("换一案", "New case", en)}
           </button>
           <button className="ghost" onClick={() => setModal("create")}>
             {t("创作", "Create", en)}
@@ -559,8 +597,10 @@ export default function App({ locale }: { locale: string }) {
                 onClick={loadCompass}
               >
                 {compassLoading
-                  ? t("正在出题…", "Writing questions…", en)
-                  : t("请 DeepSeek 出题", "Ask DeepSeek", en)}
+                  ? t("正在写问句…", "Writing questions…", en)
+                  : compass
+                    ? t("换一批问句", "More questions", en)
+                    : t("生成问句", "Suggest questions", en)}
               </button>
             </div>
             <div className="compass-tabs">
@@ -596,8 +636,8 @@ export default function App({ locale }: { locale: string }) {
               ) : (
                 <span style={{ color: "var(--muted)", fontSize: 12 }}>
                   {t(
-                    "点「请 DeepSeek 出题」后，这里会出现可点击的是非问句。",
-                    "Click “Ask DeepSeek” to fill this row with clickable questions.",
+                    "点「生成问句」只给当前这道汤想问题，不会换题。要换汤请点右上角「换一案」。",
+                    "This only suggests questions for the current case. Use “New case” to cook a different puzzle.",
                     en,
                   )}
                 </span>

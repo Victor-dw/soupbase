@@ -103,6 +103,22 @@ describe("survival runs", () => {
     expect(JSON.stringify(row.titles)).toContain("生成题");
   });
 
+  it("rerolls a new generated case without adding it to the catalog", async () => {
+    const c = new Client();
+    const a = await c.request("runs", "POST", { locale: "zh" });
+    const b = await c.request(`runs/${a.data.run.id}/reroll`, "POST", {});
+    expect(b.status).toBe(200);
+    expect(b.data.run.id).toBe(a.data.run.id);
+    expect(b.data.game.id).not.toBe(a.data.game.id);
+    expect(b.data.game.puzzle.title).not.toBe(a.data.game.puzzle.title);
+    const catalog = await c.request("puzzles");
+    expect(
+      catalog.data.some(
+        (p: { id: string }) => p.id === b.data.game.puzzle.id,
+      ),
+    ).toBe(false);
+  });
+
   it("caches compass until the player asks for a fresh batch", async () => {
     const c = new Client();
     const r = await c.request("runs", "POST", { locale: "zh" });

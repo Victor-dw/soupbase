@@ -24,6 +24,7 @@ import {
   currentRun,
   endRun,
   endRunForSession,
+  rerollRun,
   startRun,
 } from "./runs";
 async function readBody(req: NextRequest) {
@@ -224,6 +225,8 @@ export async function handle(req: NextRequest, paths: string[]) {
       idSchema.parse(id);
       if (action === "advance" && method === "POST")
         return reply(await advanceRun(id, v.id));
+      if (action === "reroll" && method === "POST")
+        return reply(await rerollRun(id, v.id));
       if (action === "collect" && method === "POST")
         return reply(await collectRunPuzzle(id, v.id));
       if (action === "end" && method === "POST") {

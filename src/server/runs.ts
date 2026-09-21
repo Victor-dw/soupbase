@@ -64,6 +64,26 @@ export async function startRun(visitorId: string, locale: "zh" | "en") {
   return { run: publicRun(row), game: await game(made.sessionId, visitorId) };
 }
 
+export async function rerollRun(runId: string, visitorId: string) {
+  const [row] = await query(
+    sql`SELECT * FROM runs WHERE id=${runId} AND visitor_id=${visitorId}`,
+  );
+  if (!row || row.status !== "active") throw new AppError("not_found", 404);
+  const titles = Array.isArray(row.titles) ? row.titles.map(String) : [];
+  const locale = row.locale === "en" ? "en" : "zh";
+  const made = await insertGenerated(
+    visitorId,
+    locale,
+    Number(row.streak),
+    titles,
+  );
+  await query(
+    sql`UPDATE runs SET current_puzzle_id=${made.puzzleId},current_session_id=${made.sessionId},titles=${JSON.stringify([...titles, made.title])}::jsonb,updated_at=now() WHERE id=${runId} AND status='active'`,
+  );
+  const [updated] = await query(sql`SELECT * FROM runs WHERE id=${runId}`);
+  return { run: publicRun(updated), game: await game(made.sessionId, visitorId) };
+}
+
 export async function advanceRun(runId: string, visitorId: string) {
   const [row] = await query(
     sql`SELECT * FROM runs WHERE id=${runId} AND visitor_id=${visitorId}`,
