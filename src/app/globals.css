@@ -372,6 +372,10 @@ select {
   overflow: auto;
   padding-bottom: 4px;
 }
+.compass-wait {
+  color: var(--accent);
+  font-size: 12px;
+}
 .composer {
   display: flex;
   gap: 8px;
