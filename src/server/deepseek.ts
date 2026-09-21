@@ -134,20 +134,23 @@ export async function generateCompass(input: {
   language: "zh" | "en";
   surface: string;
   history: { input: string; decision: string }[];
+  avoid?: string[];
 }): Promise<Compass> {
   const asked = input.history
     .slice(-8)
     .map((t) => `${t.input} → ${t.decision}`)
     .join("\n");
+  const avoid = (input.avoid || []).filter(Boolean).slice(0, 16).join("、");
   const prompt =
     input.language === "zh"
       ? `你是海龟汤调查罗盘。只能根据汤面和已问过的是非问题，建议下一步是非问句。
-绝对不要编造或暗示汤底。问句必须能用「是/不是」回答。
+绝对不要编造或暗示汤底。问句必须能用「是/不是」回答。换一批新问句，不要重复：${avoid || "无"}。
 汤面：${input.surface}
 已问：${asked || "无"}
 JSON：{"identity":["..."],"scene":["..."],"cause":["..."]}，每类 2-4 句。`
       : `Suggest yes/no investigation questions from the surface and asked questions only.
-Never imply the solution. Surface: ${input.surface}
+Never imply the solution. Write a fresh batch, do not repeat: ${avoid || "none"}.
+Surface: ${input.surface}
 Asked: ${asked || "none"}
 JSON: {"identity":["..."],"scene":["..."],"cause":["..."]}, 2-4 each.`;
   return compassSchema.parse(await chatJson(prompt));

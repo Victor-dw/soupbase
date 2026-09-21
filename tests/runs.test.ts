@@ -6,6 +6,7 @@ import doorbell from "../content/puzzles/zh/doorbell.json";
 
 const { id: _id, ...sample } = doorbell;
 let generated = 0;
+let compassCalls = 0;
 vi.mock("../src/server/deepseek", () => ({
   generatePuzzle: async ({ language }: { language: string }) => {
     generated += 1;
@@ -15,11 +16,14 @@ vi.mock("../src/server/deepseek", () => ({
       title: "生成题 " + generated,
     };
   },
-  generateCompass: async () => ({
-    identity: ["他的职业特殊吗？", "他喝醉了吗？"],
-    scene: ["事发地点靠近海吗？", "关掉的灯能被远处看见吗？"],
-    cause: ["新闻里有事故吗？", "他是因为内疚才死的吗？"],
-  }),
+  generateCompass: async () => {
+    compassCalls += 1;
+    return {
+      identity: [`身份问句 ${compassCalls}`, "他喝醉了吗？"],
+      scene: ["事发地点靠近海吗？", "关掉的灯能被远处看见吗？"],
+      cause: ["新闻里有事故吗？", "他是因为内疚才死的吗？"],
+    };
+  },
 }));
 vi.mock("@ai-sdk/typesafe-ai", () => ({
   createTypeSafeAi: ({ apiKey }: { apiKey: string }) => ({
@@ -99,14 +103,21 @@ describe("survival runs", () => {
     expect(JSON.stringify(row.titles)).toContain("生成题");
   });
 
-  it("hides compass generation from the catalog and caches by turn count", async () => {
+  it("caches compass until the player asks for a fresh batch", async () => {
     const c = new Client();
     const r = await c.request("runs", "POST", { locale: "zh" });
     const sid = r.data.game.id;
     const first = await c.request(`sessions/${sid}/compass`, "POST", {});
     expect(first.status).toBe(200);
     expect(first.data.compass.identity).toHaveLength(2);
-    const second = await c.request(`sessions/${sid}/compass`, "POST", {});
-    expect(second.data.compass.identity[0]).toBe(first.data.compass.identity[0]);
+    const cached = await c.request(`sessions/${sid}/compass`, "POST", {});
+    expect(cached.data.compass.identity[0]).toBe(first.data.compass.identity[0]);
+    const refreshed = await c.request(`sessions/${sid}/compass`, "POST", {
+      refresh: true,
+    });
+    expect(refreshed.status).toBe(200);
+    expect(refreshed.data.compass.identity[0]).not.toBe(
+      first.data.compass.identity[0],
+    );
   });
 });

@@ -14,6 +14,7 @@ import {
   hash,
   publicPuzzle,
 } from "./access";
+import type { Compass } from "@/shared/run";
 import { config } from "./config";
 import { generateCompass } from "./deepseek";
 import { judge, selectKey } from "./model";
@@ -265,21 +266,43 @@ export async function handle(req: NextRequest, paths: string[]) {
         return reply(await game(id, v.id));
       }
       if (action === "compass" && method === "POST") {
+        const b = z
+          .strictObject({ refresh: z.boolean().optional() })
+          .parse(body);
         const history = await query<{ input: string; decision: string }>(
           sql`SELECT input,decision FROM turns WHERE session_id=${id} AND status='complete' AND kind='question' ORDER BY created_at DESC LIMIT 8`,
         );
         const locale = s.public_content.language === "en" ? "en" : "zh";
-        const extras = (s.extras && typeof s.extras === "object" ? s.extras : {}) as {
-          compass?: unknown;
+        const rawExtras = s.extras;
+        const extras = (
+          typeof rawExtras === "string"
+            ? JSON.parse(rawExtras)
+            : rawExtras && typeof rawExtras === "object"
+              ? rawExtras
+              : {}
+        ) as {
+          compass?: Compass;
           compassTurns?: number;
         };
         const turnCount = history.length;
-        if (extras.compass && extras.compassTurns === turnCount)
+        if (
+          !b.refresh &&
+          extras.compass &&
+          extras.compassTurns === turnCount
+        )
           return reply({ compass: extras.compass });
+        const previous = extras.compass;
         const compass = await generateCompass({
           language: locale,
           surface: s.public_content.surface,
           history: history.reverse(),
+          avoid: previous
+            ? [
+                ...previous.identity,
+                ...previous.scene,
+                ...previous.cause,
+              ]
+            : [],
         });
         await query(
           sql`UPDATE sessions SET extras=${JSON.stringify({ ...extras, compass, compassTurns: turnCount })}::jsonb WHERE id=${id}`,

@@ -82,6 +82,7 @@ export default function App({ locale }: { locale: string }) {
   const [question, setQuestion] = useState("");
   const [guess, setGuess] = useState("");
   const [compass, setCompass] = useState<Compass | null>(null);
+  const [compassLoading, setCompassLoading] = useState(false);
   const [cat, setCat] = useState<keyof Compass>("identity");
   const [modal, setModal] = useState<
     null | "library" | "guess" | "truth" | "rules" | "create"
@@ -243,7 +244,6 @@ export default function App({ locale }: { locale: string }) {
       );
       setGame(updated);
       setQuestion("");
-      setCompass(null);
     });
   }
   async function submitGuess(e: FormEvent) {
@@ -292,15 +292,29 @@ export default function App({ locale }: { locale: string }) {
     });
   }
   async function loadCompass() {
-    await runTask(async () => {
+    if (compassLoading) return;
+    setCompassLoading(true);
+    setError("");
+    try {
       const current = await ensureGame();
       const r = await api<{ compass: Compass }>(
         `sessions/${current.id}/compass`,
         "POST",
-        {},
+        { refresh: true },
       );
       setCompass(r.compass);
-    });
+      setNotice(
+        t(
+          "罗盘已更新：点下面的问句就会交给 Jev。",
+          "Compass ready. Click a question to ask Jev.",
+          en,
+        ),
+      );
+    } catch (e) {
+      explain(e);
+    } finally {
+      setCompassLoading(false);
+    }
   }
   async function createPuzzle(e: FormEvent) {
     e.preventDefault();
@@ -539,8 +553,14 @@ export default function App({ locale }: { locale: string }) {
           <div className="compass">
             <div className="kicker">
               <span>{t("调查罗盘", "Compass", en)}</span>
-              <button className="ghost" disabled={!selected || loading} onClick={loadCompass}>
-                {t("请 DeepSeek 出题", "Ask DeepSeek", en)}
+              <button
+                className="ghost"
+                disabled={!selected || compassLoading}
+                onClick={loadCompass}
+              >
+                {compassLoading
+                  ? t("正在出题…", "Writing questions…", en)
+                  : t("请 DeepSeek 出题", "Ask DeepSeek", en)}
               </button>
             </div>
             <div className="compass-tabs">
@@ -559,7 +579,15 @@ export default function App({ locale }: { locale: string }) {
               ))}
             </div>
             <div className="chips">
-              {chips.length ? (
+              {compassLoading ? (
+                <span className="compass-wait">
+                  {t(
+                    "DeepSeek 正在根据汤面写是非问句，通常要十几秒。出题期间仍可手打提问。",
+                    "DeepSeek is writing yes/no questions from the surface. You can still type while it works.",
+                    en,
+                  )}
+                </span>
+              ) : chips.length ? (
                 chips.map((q) => (
                   <button key={q} disabled={loading} onClick={() => ask(q)}>
                     {q}
@@ -567,7 +595,11 @@ export default function App({ locale }: { locale: string }) {
                 ))
               ) : (
                 <span style={{ color: "var(--muted)", fontSize: 12 }}>
-                  {t("点上面生成问句。罗盘看不到汤底。", "Generate questions. The compass never sees the solution.", en)}
+                  {t(
+                    "点「请 DeepSeek 出题」后，这里会出现可点击的是非问句。",
+                    "Click “Ask DeepSeek” to fill this row with clickable questions.",
+                    en,
+                  )}
                 </span>
               )}
             </div>
